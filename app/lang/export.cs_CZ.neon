@@ -2,7 +2,6 @@ ticket:
     first_name: "Jméno"
     last_name: "Příjmení"
     nickname: "Přezdívka"
-    username: "SkautIS účet"
     roles: "Role"
     subevents: "Podakce"
     schedule: "Harmonogram"

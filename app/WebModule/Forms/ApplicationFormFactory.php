@@ -27,7 +27,6 @@ use App\Services\AclService;
 use App\Services\ApplicationService;
 use App\Services\FilesService;
 use App\Services\SettingsService;
-use App\Services\SkautIsService;
 use App\Services\SubeventService;
 use App\Utils\Validators;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -45,7 +44,6 @@ use Nette\Utils\Strings;
 use Nettrine\ORM\EntityManagerDecorator;
 use Nextras\FormComponents\Controls\DateControl;
 use Nextras\FormComponents\Controls\DateTimeControl;
-use Skautis\Wsdl\WsdlException;
 use stdClass;
 use Throwable;
 use Tracy\Debugger;
@@ -65,6 +63,7 @@ use const UPLOAD_ERR_OK;
  */
 class ApplicationFormFactory
 {
+
     use Nette\SmartObject;
 
     /**
@@ -73,9 +72,6 @@ class ApplicationFormFactory
      * @var User
      */
     private $user;
-
-    /** @var callable[] */
-    public $onSkautIsError;
 
     /** @var BaseFormFactory */
     private $baseFormFactory;
@@ -94,9 +90,6 @@ class ApplicationFormFactory
 
     /** @var CustomInputValueRepository */
     private $customInputValueRepository;
-
-    /** @var SkautIsService */
-    private $skautIsService;
 
     /** @var SettingsService */
     private $settingsService;
@@ -123,37 +116,36 @@ class ApplicationFormFactory
     private $translator;
 
     public function __construct(
-        BaseFormFactory $baseFormFactory,
-        EntityManagerDecorator $em,
-        UserRepository $userRepository,
-        RoleRepository $roleRepository,
-        CustomInputRepository $customInputRepository,
-        CustomInputValueRepository $customInputValueRepository,
-        SkautIsService $skautIsService,
-        SettingsService $settingsService,
-        SubeventRepository $subeventRepository,
-        AclService $aclService,
-        ApplicationService $applicationService,
-        Validators $validators,
-        FilesService $filesService,
-        SubeventService $subeventService,
-        ITranslator $translator
-    ) {
-        $this->baseFormFactory            = $baseFormFactory;
-        $this->em                         = $em;
-        $this->userRepository             = $userRepository;
-        $this->roleRepository             = $roleRepository;
-        $this->customInputRepository      = $customInputRepository;
+            BaseFormFactory $baseFormFactory,
+            EntityManagerDecorator $em,
+            UserRepository $userRepository,
+            RoleRepository $roleRepository,
+            CustomInputRepository $customInputRepository,
+            CustomInputValueRepository $customInputValueRepository,
+            SettingsService $settingsService,
+            SubeventRepository $subeventRepository,
+            AclService $aclService,
+            ApplicationService $applicationService,
+            Validators $validators,
+            FilesService $filesService,
+            SubeventService $subeventService,
+            ITranslator $translator
+    )
+    {
+        $this->baseFormFactory = $baseFormFactory;
+        $this->em = $em;
+        $this->userRepository = $userRepository;
+        $this->roleRepository = $roleRepository;
+        $this->customInputRepository = $customInputRepository;
         $this->customInputValueRepository = $customInputValueRepository;
-        $this->skautIsService             = $skautIsService;
-        $this->settingsService            = $settingsService;
-        $this->subeventRepository         = $subeventRepository;
-        $this->aclService                 = $aclService;
-        $this->applicationService         = $applicationService;
-        $this->validators                 = $validators;
-        $this->filesService               = $filesService;
-        $this->subeventService            = $subeventService;
-        $this->translator                 = $translator;
+        $this->settingsService = $settingsService;
+        $this->subeventRepository = $subeventRepository;
+        $this->aclService = $aclService;
+        $this->applicationService = $applicationService;
+        $this->validators = $validators;
+        $this->filesService = $filesService;
+        $this->subeventService = $subeventService;
+        $this->translator = $translator;
     }
 
     /**
@@ -163,7 +155,7 @@ class ApplicationFormFactory
      * @throws NonUniqueResultException
      * @throws Throwable
      */
-    public function create(int $id) : Form
+    public function create(int $id): Form
     {
         $this->user = $this->userRepository->findById($id);
 
@@ -174,10 +166,10 @@ class ApplicationFormFactory
         $inputSex = $form->addRadioList('sex', 'web.application_content.sex', Sex::getSexOptions());
 
         $inputFirstName = $form->addText('firstName', 'web.application_content.firstname')
-            ->addRule(Form::FILLED, 'web.application_content.firstname_empty');
+                ->addRule(Form::FILLED, 'web.application_content.firstname_empty');
 
         $inputLastName = $form->addText('lastName', 'web.application_content.lastname')
-            ->addRule(Form::FILLED, 'web.application_content.lastname_empty');
+                ->addRule(Form::FILLED, 'web.application_content.lastname_empty');
 
         $inputNickName = $form->addText('nickName', 'web.application_content.nickname');
 
@@ -185,31 +177,29 @@ class ApplicationFormFactory
         $inputBirthdateDate->addRule(Form::FILLED, 'web.application_content.birthdate_empty');
         $form->addComponent($inputBirthdateDate, 'birthdate');
 
-        if ($this->user->isMember()) {
-            $inputSex->setDisabled();
-            $inputFirstName->setDisabled();
-            $inputLastName->setDisabled();
-            $inputNickName->setDisabled();
-            $inputBirthdateDate->setDisabled();
-        }
+        $inputSex->setDisabled();
+        $inputFirstName->setDisabled();
+        $inputLastName->setDisabled();
+        $inputNickName->setDisabled();
+        $inputBirthdateDate->setDisabled();
 
         $form->addText('email', 'web.application_content.email')
-            ->addRule(Form::FILLED)
-            ->setDisabled();
+                ->addRule(Form::FILLED)
+                ->setDisabled();
 
         $form->addText('street', 'web.application_content.street')
-            ->addRule(Form::FILLED, 'web.application_content.street_empty')
-            ->addRule(Form::PATTERN, 'web.application_content.street_format', '^(.*[^0-9]+) (([1-9][0-9]*)/)?([1-9][0-9]*[a-cA-C]?)$');
+                ->addRule(Form::FILLED, 'web.application_content.street_empty')
+                ->addRule(Form::PATTERN, 'web.application_content.street_format', '^(.*[^0-9]+) (([1-9][0-9]*)/)?([1-9][0-9]*[a-cA-C]?)$');
 
         $form->addText('city', 'web.application_content.city')
-            ->addRule(Form::FILLED, 'web.application_content.city_empty');
+                ->addRule(Form::FILLED, 'web.application_content.city_empty');
 
         $form->addText('postcode', 'web.application_content.postcode')
-            ->addRule(Form::FILLED, 'web.application_content.postcode_empty')
-            ->addRule(Form::PATTERN, 'web.application_content.postcode_format', '^\d{3} ?\d{2}$');
+                ->addRule(Form::FILLED, 'web.application_content.postcode_empty')
+                ->addRule(Form::PATTERN, 'web.application_content.postcode_format', '^\d{3} ?\d{2}$');
 
         $form->addText('state', 'web.application_content.state')
-            ->addRule(Form::FILLED, 'web.application_content.state_empty');
+                ->addRule(Form::FILLED, 'web.application_content.state_empty');
 
         $this->addRolesSelect($form);
 
@@ -220,7 +210,7 @@ class ApplicationFormFactory
         $this->addCustomInputs($form);
 
         $form->addCheckbox('agreement', $this->settingsService->getValue(Settings::APPLICATION_AGREEMENT))
-            ->addRule(Form::FILLED, 'web.application_content.agreement_empty');
+                ->addRule(Form::FILLED, 'web.application_content.agreement_empty');
 
         $form->addSubmit('submit', 'web.application_content.register');
 
@@ -248,9 +238,9 @@ class ApplicationFormFactory
      *
      * @throws Throwable
      */
-    public function processForm(Form $form, stdClass $values) : void
+    public function processForm(Form $form, stdClass $values): void
     {
-        $this->em->transactional(function () use ($values) : void {
+        $this->em->transactional(function () use ($values): void {
             if (property_exists($values, 'sex')) {
                 $this->user->setSex($values->sex);
             }
@@ -279,7 +269,7 @@ class ApplicationFormFactory
             //vlastni pole
             foreach ($this->customInputRepository->findAll() as $customInput) {
                 $customInputValue = $this->user->getCustomInputValue($customInput);
-                $customInputName  = 'custom' . $customInput->getId();
+                $customInputName = 'custom' . $customInput->getId();
 
                 if ($customInput instanceof CustomText) {
                     /** @var CustomTextValue $customInputValue */
@@ -327,32 +317,7 @@ class ApplicationFormFactory
             }
 
             //podakce
-            $subevents = $this->subeventRepository->explicitSubeventsExists() && ! empty($values->subevents)
-                ? $this->subeventRepository->findSubeventsByIds($values->subevents)
-                : new ArrayCollection([$this->subeventRepository->findImplicit()]);
-
-            //aktualizace udaju ve skautIS
-            try {
-                $this->skautIsService->updatePersonBasic(
-                    $this->user->getSkautISPersonId(),
-                    $this->user->getSex(),
-                    $this->user->getBirthdate(),
-                    $this->user->getFirstName(),
-                    $this->user->getLastName(),
-                    $this->user->getNickName()
-                );
-
-                $this->skautIsService->updatePersonAddress(
-                    $this->user->getSkautISPersonId(),
-                    $this->user->getStreet(),
-                    $this->user->getCity(),
-                    $this->user->getPostcode(),
-                    $this->user->getState()
-                );
-            } catch (WsdlException $ex) {
-                Debugger::log($ex, ILogger::WARNING);
-                $this->onSkautIsError();
-            }
+            $subevents = $this->subeventRepository->explicitSubeventsExists() && !empty($values->subevents) ? $this->subeventRepository->findSubeventsByIds($values->subevents) : new ArrayCollection([$this->subeventRepository->findImplicit()]);
 
             //vytvoreni prihlasky
             $this->applicationService->register($this->user, $roles, $subevents, $this->user);
@@ -362,7 +327,7 @@ class ApplicationFormFactory
     /**
      * Přidá vlastní pole přihlášky.
      */
-    private function addCustomInputs(Form $form) : void
+    private function addCustomInputs(Form $form): void
     {
         foreach ($this->customInputRepository->findAllOrderedByPosition() as $customInput) {
             switch (true) {
@@ -398,51 +363,51 @@ class ApplicationFormFactory
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
-    private function addSubeventsSelect(Form $form) : void
+    private function addSubeventsSelect(Form $form): void
     {
-        if (! $this->subeventRepository->explicitSubeventsExists()) {
+        if (!$this->subeventRepository->explicitSubeventsExists()) {
             return;
         }
 
         $subeventsOptions = $this->subeventService->getSubeventsOptionsWithCapacity(true, true, false, false);
 
         $subeventsSelect = $form->addMultiSelect('subevents', 'web.application_content.subevents')->setItems(
-            $subeventsOptions
+                $subeventsOptions
         );
         $subeventsSelect
-            ->setRequired(false)
-            ->addRule([$this, 'validateSubeventsCapacities'], 'web.application_content.subevents_capacity_occupied');
+                ->setRequired(false)
+                ->addRule([$this, 'validateSubeventsCapacities'], 'web.application_content.subevents_capacity_occupied');
 
         /** @var MultiSelectBox $rolesSelect */
         $rolesSelect = $form['roles'];
 
         $subeventsSelect
-            ->addConditionOn($rolesSelect, [$this, 'toggleSubeventsRequired'])
-            ->addRule(Form::FILLED, 'web.application_content.subevents_empty');
+                ->addConditionOn($rolesSelect, [$this, 'toggleSubeventsRequired'])
+                ->addRule(Form::FILLED, 'web.application_content.subevents_empty');
 
         //generovani chybovych hlasek pro vsechny kombinace podakci
         foreach ($this->subeventRepository->findExplicitOrderedByName() as $subevent) {
-            if (! $subevent->getIncompatibleSubevents()->isEmpty()) {
+            if (!$subevent->getIncompatibleSubevents()->isEmpty()) {
                 $subeventsSelect->addRule(
-                    [$this, 'validateSubeventsIncompatible'],
-                    $this->translator->translate(
-                        'web.application_content.incompatible_subevents_selected',
-                        null,
-                        ['subevent' => $subevent->getName(), 'incompatibleSubevents' => $subevent->getIncompatibleSubeventsText()]
-                    ),
-                    [$subevent]
+                        [$this, 'validateSubeventsIncompatible'],
+                        $this->translator->translate(
+                                'web.application_content.incompatible_subevents_selected',
+                                null,
+                                ['subevent' => $subevent->getName(), 'incompatibleSubevents' => $subevent->getIncompatibleSubeventsText()]
+                        ),
+                        [$subevent]
                 );
             }
 
-            if (! $subevent->getRequiredSubeventsTransitive()->isEmpty()) {
+            if (!$subevent->getRequiredSubeventsTransitive()->isEmpty()) {
                 $subeventsSelect->addRule(
-                    [$this, 'validateSubeventsRequired'],
-                    $this->translator->translate(
-                        'web.application_content.required_subevents_not_selected',
-                        null,
-                        ['subevent' => $subevent->getName(), 'requiredSubevents' => $subevent->getRequiredSubeventsTransitiveText()]
-                    ),
-                    [$subevent]
+                        [$this, 'validateSubeventsRequired'],
+                        $this->translator->translate(
+                                'web.application_content.required_subevents_not_selected',
+                                null,
+                                ['subevent' => $subevent->getName(), 'requiredSubevents' => $subevent->getRequiredSubeventsTransitiveText()]
+                        ),
+                        [$subevent]
                 );
             }
         }
@@ -451,40 +416,40 @@ class ApplicationFormFactory
     /**
      * Přidá select pro výběr rolí.
      */
-    private function addRolesSelect(Form $form) : void
+    private function addRolesSelect(Form $form): void
     {
         $registerableOptions = $this->aclService->getRegisterableNowOptionsWithCapacity();
 
         $rolesSelect = $form->addMultiSelect('roles', 'web.application_content.roles')->setItems(
-            $registerableOptions
-        )
-            ->addRule(Form::FILLED, 'web.application_content.roles_empty')
-            ->addRule([$this, 'validateRolesCapacities'], 'web.application_content.roles_capacity_occupied')
-            ->addRule([$this, 'validateRolesRegisterable'], 'web.application_content.role_is_not_registerable');
+                        $registerableOptions
+                )
+                ->addRule(Form::FILLED, 'web.application_content.roles_empty')
+                ->addRule([$this, 'validateRolesCapacities'], 'web.application_content.roles_capacity_occupied')
+                ->addRule([$this, 'validateRolesRegisterable'], 'web.application_content.role_is_not_registerable');
 
         //generovani chybovych hlasek pro vsechny kombinace roli
         foreach ($this->roleRepository->findAllRegisterableNowOrUsersOrderedByName($this->user) as $role) {
-            if (! $role->getIncompatibleRoles()->isEmpty()) {
+            if (!$role->getIncompatibleRoles()->isEmpty()) {
                 $rolesSelect->addRule(
-                    [$this, 'validateRolesIncompatible'],
-                    $this->translator->translate(
-                        'web.application_content.incompatible_roles_selected',
-                        null,
-                        ['role' => $role->getName(), 'incompatibleRoles' => $role->getIncompatibleRolesText()]
-                    ),
-                    [$role]
+                        [$this, 'validateRolesIncompatible'],
+                        $this->translator->translate(
+                                'web.application_content.incompatible_roles_selected',
+                                null,
+                                ['role' => $role->getName(), 'incompatibleRoles' => $role->getIncompatibleRolesText()]
+                        ),
+                        [$role]
                 );
             }
 
-            if (! $role->getRequiredRolesTransitive()->isEmpty()) {
+            if (!$role->getRequiredRolesTransitive()->isEmpty()) {
                 $rolesSelect->addRule(
-                    [$this, 'validateRolesRequired'],
-                    $this->translator->translate(
-                        'web.application_content.required_roles_not_selected',
-                        null,
-                        ['role' => $role->getName(), 'requiredRoles' => $role->getRequiredRolesTransitiveText()]
-                    ),
-                    [$role]
+                        [$this, 'validateRolesRequired'],
+                        $this->translator->translate(
+                                'web.application_content.required_roles_not_selected',
+                                null,
+                                ['role' => $role->getName(), 'requiredRoles' => $role->getRequiredRolesTransitiveText()]
+                        ),
+                        [$role]
                 );
             }
         }
@@ -495,8 +460,8 @@ class ApplicationFormFactory
         }
 
         $rolesSelect->addCondition(self::class . '::toggleArrivalDeparture', $ids)
-            ->toggle('arrivalInput')
-            ->toggle('departureInput');
+                ->toggle('arrivalInput')
+                ->toggle('departureInput');
 
         //pokud je na vyber jen jedna role, je oznacena
         if (count($registerableOptions) === 1) {
@@ -508,7 +473,7 @@ class ApplicationFormFactory
     /**
      * Přidá pole pro zadání příjezdu a odjezdu.
      */
-    private function addArrivalDeparture(Form $form) : void
+    private function addArrivalDeparture(Form $form): void
     {
         $arrivalDateTime = new DateTimeControl('web.application_content.arrival');
         $arrivalDateTime->setOption('id', 'arrivalInput');
@@ -522,7 +487,7 @@ class ApplicationFormFactory
     /**
      * Ověří kapacity podakcí.
      */
-    public function validateSubeventsCapacities(MultiSelectBox $field) : bool
+    public function validateSubeventsCapacities(MultiSelectBox $field): bool
     {
         $selectedSubevents = $this->subeventRepository->findSubeventsByIds($field->getVaLue());
 
@@ -532,7 +497,7 @@ class ApplicationFormFactory
     /**
      * Ověří kapacity rolí.
      */
-    public function validateRolesCapacities(MultiSelectBox $field) : bool
+    public function validateRolesCapacities(MultiSelectBox $field): bool
     {
         $selectedRoles = $this->roleRepository->findRolesByIds($field->getValue());
 
@@ -544,10 +509,10 @@ class ApplicationFormFactory
      *
      * @param Subevent[] $args
      */
-    public function validateSubeventsIncompatible(MultiSelectBox $field, array $args) : bool
+    public function validateSubeventsIncompatible(MultiSelectBox $field, array $args): bool
     {
         $selectedSubevents = $this->subeventRepository->findSubeventsByIds($field->getValue());
-        $testSubevent      = $args[0];
+        $testSubevent = $args[0];
 
         return $this->validators->validateSubeventsIncompatible($selectedSubevents, $testSubevent);
     }
@@ -557,10 +522,10 @@ class ApplicationFormFactory
      *
      * @param Subevent[] $args
      */
-    public function validateSubeventsRequired(MultiSelectBox $field, array $args) : bool
+    public function validateSubeventsRequired(MultiSelectBox $field, array $args): bool
     {
         $selectedSubevents = $this->subeventRepository->findSubeventsByIds($field->getValue());
-        $testSubevent      = $args[0];
+        $testSubevent = $args[0];
 
         return $this->validators->validateSubeventsRequired($selectedSubevents, $testSubevent);
     }
@@ -570,10 +535,10 @@ class ApplicationFormFactory
      *
      * @param Role[] $args
      */
-    public function validateRolesIncompatible(MultiSelectBox $field, array $args) : bool
+    public function validateRolesIncompatible(MultiSelectBox $field, array $args): bool
     {
         $selectedRoles = $this->roleRepository->findRolesByIds($field->getValue());
-        $testRole      = $args[0];
+        $testRole = $args[0];
 
         return $this->validators->validateRolesIncompatible($selectedRoles, $testRole);
     }
@@ -583,10 +548,10 @@ class ApplicationFormFactory
      *
      * @param Role[] $args
      */
-    public function validateRolesRequired(MultiSelectBox $field, array $args) : bool
+    public function validateRolesRequired(MultiSelectBox $field, array $args): bool
     {
         $selectedRoles = $this->roleRepository->findRolesByIds($field->getValue());
-        $testRole      = $args[0];
+        $testRole = $args[0];
 
         return $this->validators->validateRolesRequired($selectedRoles, $testRole);
     }
@@ -594,7 +559,7 @@ class ApplicationFormFactory
     /**
      * Ověří registrovatelnost rolí.
      */
-    public function validateRolesRegisterable(MultiSelectBox $field) : bool
+    public function validateRolesRegisterable(MultiSelectBox $field): bool
     {
         $selectedRoles = $this->roleRepository->findRolesByIds($field->getValue());
 
@@ -604,7 +569,7 @@ class ApplicationFormFactory
     /**
      * Vrací, zda je výběr podakcí povinný pro kombinaci rolí.
      */
-    public function toggleSubeventsRequired(MultiSelectBox $field) : bool
+    public function toggleSubeventsRequired(MultiSelectBox $field): bool
     {
         $rolesWithSubevents = $this->roleRepository->findRolesIds($this->roleRepository->findAllWithSubevents());
         foreach ($field->getValue() as $roleId) {
@@ -619,7 +584,7 @@ class ApplicationFormFactory
     /**
      * Přepne zobrazení polí pro příjezd a odjezd.
      */
-    public static function toggleArrivalDeparture(IControl $control) : bool
+    public static function toggleArrivalDeparture(IControl $control): bool
     {
         return false;
     }
@@ -627,8 +592,9 @@ class ApplicationFormFactory
     /**
      * Vygeneruje cestu souboru.
      */
-    private function generatePath(FileUpload $file) : string
+    private function generatePath(FileUpload $file): string
     {
         return CustomFile::PATH . '/' . Random::generate(5) . '/' . Strings::webalize($file->name, '.');
     }
+
 }

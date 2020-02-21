@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cfb838771c4e7138e09e6ceaf9e6b2e2",
+    "content-hash": "8ad14604594be812aad3babc79123c7d",
     "packages": [
         {
             "name": "azuyalabs/yasumi",
@@ -4272,16 +4272,16 @@
         },
         {
             "name": "nette/robot-loader",
-            "version": "v3.2.1",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/robot-loader.git",
-                "reference": "d2a100e1f5cab390c78bc88709abbc91249c3993"
+                "reference": "38e8a270567a4ad9fe716b40fcda5a6580afa3c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/robot-loader/zipball/d2a100e1f5cab390c78bc88709abbc91249c3993",
-                "reference": "d2a100e1f5cab390c78bc88709abbc91249c3993",
+                "url": "https://api.github.com/repos/nette/robot-loader/zipball/38e8a270567a4ad9fe716b40fcda5a6580afa3c0",
+                "reference": "38e8a270567a4ad9fe716b40fcda5a6580afa3c0",
                 "shasum": ""
             },
             "require": {
@@ -4309,8 +4309,8 @@
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause",
-                "GPL-2.0",
-                "GPL-3.0"
+                "GPL-2.0-only",
+                "GPL-3.0-only"
             ],
             "authors": [
                 {
@@ -4331,7 +4331,7 @@
                 "nette",
                 "trait"
             ],
-            "time": "2019-12-26T22:32:02+00:00"
+            "time": "2020-02-20T22:17:50+00:00"
         },
         {
             "name": "nette/routing",
@@ -5683,121 +5683,6 @@
                 "pdf"
             ],
             "time": "2020-02-19T11:30:55+00:00"
-        },
-        {
-            "name": "skautis/nette",
-            "version": "v2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/skaut/SkautisNette.git",
-                "reference": "a962a18fac109c5882e92b7840074de17a89fd65"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/skaut/SkautisNette/zipball/a962a18fac109c5882e92b7840074de17a89fd65",
-                "reference": "a962a18fac109c5882e92b7840074de17a89fd65",
-                "shasum": ""
-            },
-            "require": {
-                "nette/di": "^2.4.6 || ^3.0.1",
-                "nette/http": "^2.4.7 || ^3.0",
-                "nette/utils": "^2.5.4 || ^3.0",
-                "php": ">=5.6",
-                "skautis/skautis": "^2.0"
-            },
-            "require-dev": {
-                "nette/bootstrap": "^2.4 || ^3.0",
-                "nette/caching": "^2.5 || ^3.0",
-                "nette/finder": "^2.4",
-                "nette/tester": "^2.3.1",
-                "tracy/tracy": "^2.5"
-            },
-            "suggest": {
-                "nette/caching": "to use Nette caching backend in CacheDecorator.",
-                "tracy/tracy": "to enable skautis panel for Tracy debug bar."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Skautis\\Nette\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "František Hána",
-                    "homepage": "http://sinacek.cz"
-                }
-            ],
-            "description": "Nette extension for Skautis library",
-            "homepage": "https://github.com/skaut/SkautisNette",
-            "keywords": [
-                "api",
-                "nette",
-                "skautis"
-            ],
-            "time": "2020-02-14T11:45:16+00:00"
-        },
-        {
-            "name": "skautis/skautis",
-            "version": "v2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/skaut/Skautis.git",
-                "reference": "090fddb9d7d6da2467f52be9f6ff4db16724c1c5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/skaut/Skautis/zipball/090fddb9d7d6da2467f52be9f6ff4db16724c1c5",
-                "reference": "090fddb9d7d6da2467f52be9f6ff4db16724c1c5",
-                "shasum": ""
-            },
-            "require": {
-                "ext-soap": "*",
-                "php": ">=5.6"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "@stable",
-                "mockery/mockery": "0.9.*",
-                "phpunit/phpunit": "4.5.*"
-            },
-            "suggest": {
-                "skautis/nette": "Integrace Skautis do Nette",
-                "skautis/skautis-bundle": "Integrace Skautis do Symfony"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Skautis\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "František Hána",
-                    "homepage": "https://github.com/sinacek"
-                },
-                {
-                    "name": "Jindřich Pilař",
-                    "homepage": "https://github.com/JindrichPilar"
-                }
-            ],
-            "description": "Library for API calls to SkautIS",
-            "homepage": "https://github.com/skaut/Skautis",
-            "keywords": [
-                "api",
-                "skaut",
-                "skautis",
-                "soap",
-                "wsdl"
-            ],
-            "time": "2017-03-07T09:02:13+00:00"
         },
         {
             "name": "snapappointments/bootstrap-select",

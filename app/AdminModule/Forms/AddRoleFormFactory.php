@@ -22,6 +22,7 @@ use Throwable;
  */
 class AddRoleFormFactory
 {
+
     use Nette\SmartObject;
 
     /** @var BaseFormFactory */
@@ -36,8 +37,8 @@ class AddRoleFormFactory
     public function __construct(BaseFormFactory $baseFormFactory, AclService $aclService, RoleRepository $roleRepository)
     {
         $this->baseFormFactory = $baseFormFactory;
-        $this->aclService      = $aclService;
-        $this->roleRepository  = $roleRepository;
+        $this->aclService = $aclService;
+        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -45,24 +46,24 @@ class AddRoleFormFactory
      *
      * @throws Throwable
      */
-    public function create() : Form
+    public function create(): Form
     {
         $form = $this->baseFormFactory->create();
 
         $form->addText('name', 'admin.acl.roles_name')
-            ->addRule(Form::FILLED, 'admin.acl.roles_name_empty')
-            ->addRule(Form::IS_NOT_IN, 'admin.acl.roles_name_exists', $this->aclService->findAllRoleNames())
-            ->addRule(Form::NOT_EQUAL, 'admin.acl.roles_name_reserved', 'test');
+                ->addRule(Form::FILLED, 'admin.acl.roles_name_empty')
+                ->addRule(Form::IS_NOT_IN, 'admin.acl.roles_name_exists', $this->aclService->findAllRoleNames())
+                ->addRule(Form::NOT_EQUAL, 'admin.acl.roles_name_reserved', 'test');
 
         $form->addSelect('parent', 'admin.acl.roles_parent', $this->aclService->getRolesWithoutRolesOptions([]))
-            ->setPrompt('')
-            ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_parent_note'));
+                ->setPrompt('')
+                ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_parent_note'));
 
         $form->addSubmit('submit', 'admin.common.save');
 
         $form->addSubmit('cancel', 'admin.common.cancel')
-            ->setValidationScope([])
-            ->setHtmlAttribute('class', 'btn btn-warning');
+                ->setValidationScope([])
+                ->setHtmlAttribute('class', 'btn btn-warning');
 
         $form->onSuccess[] = [$this, 'processForm'];
 
@@ -75,7 +76,7 @@ class AddRoleFormFactory
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function processForm(Form $form, stdClass $values) : void
+    public function processForm(Form $form, stdClass $values): void
     {
         if ($form->isSubmitted() === $form['cancel']) {
             return;
@@ -111,7 +112,6 @@ class AddRoleFormFactory
             $role->setFee($parent->getFee());
             $role->setCapacity($parent->getCapacity());
             $role->setApprovedAfterRegistration($parent->isApprovedAfterRegistration());
-            $role->setSyncedWithSkautIS($parent->isSyncedWithSkautIS());
             $role->setRegisterable($parent->isRegisterable());
             $role->setRegisterableFrom($parent->getRegisterableFrom());
             $role->setRegisterableTo($parent->getRegisterableTo());
@@ -125,4 +125,5 @@ class AddRoleFormFactory
 
         $this->aclService->saveRole($role);
     }
+
 }

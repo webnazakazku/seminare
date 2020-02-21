@@ -91,8 +91,6 @@ profile:
     postcode_format: "Zadejte PSČ ve správném formátu."
     state: "Stát"
     state_empty: "Zadejte stát."
-    update_personal_details: "Aktualizovat údaje a uložit do skautISu"
-    personal_details_synchronization_failed: "Synchronizace se skautIS se nepodařila. Zkuste se znovu přihlásit."
     personal_details_update_successful: "Osobní údaje úspěšně aktualizovány."
 
     additional_information_group: "Doplňující informace"
@@ -113,18 +111,9 @@ profile:
     no_programs: "Nemáte zvolené žádné programy."
     download_schedule: "Stáhnout harmonogram"
 
-member:
-    name: "Nepropojený účet člena"
-    title: "Nepropojený účet"
-    heading: "Nemáte propojený účet"
-    text_info: "Byli jste úspěšně přihlášeni na webu, ale pravděpodobně nejste členem Junáka."
-    text_instructions: "Pokud členy jste, pak nemáte pravděpodobně propojený svůj uživatelský účet se skutečnými údaji v registraci. Kontaktuje svého vedoucího oddílu (nebo osobu, která zpracovává registraci) a požádejte ho o propojení vašeho účtu ve skautISu s reálnými údaji."
-    text_details: "Pro propojení účtu potřebujete tyto údaje:<br>uživatelské jméno: %username%<br>bezpečnostní kód: %securityCode%"
-    text_note: "Poznámka: V žádném případě nikdy nikomu nedávejte své heslo."
-
 application_content:
     login_required_begin: "Pro registraci na seminář se musíte nejprve"
-    login_required_link: "přihlásit přes skautIS"
+    login_required_link: "přihlásit se"
     login_required_end: "."
     no_registerable_role: "Aktuálně není možné se na seminář přihlásit."
     no_registerable_role_start: "Na seminář je možné se přihlásit od %start%."
@@ -168,7 +157,6 @@ application_content:
     departure: "Odjezd"
     agreement_empty: "Musíte souhlasit s poskytnutím údajů."
     register: "Registrovat"
-    register_synchronization_failed: "Synchronizace se skautIS se nepodařila. Zkuste se znovu přihlásit a upravit údaje v profilu."
     register_successful: "Registrace byla úspěšně odeslána."
 
     application_date: "Datum přihlášky"
@@ -200,7 +188,7 @@ document_content:
 
 faq_content:
     login_required_begin: "Pro položení otázky se musíte"
-    login_required_link: "přihlásit přes skautIS"
+    login_required_link: "přihlásit se"
     login_required_end: "."
     add_question_heading: "Nenašli jste odpověď na svoji otázku? Zeptejte se."
 
@@ -211,7 +199,7 @@ faq_content:
 
 programs_content:
     login_required_begin: "Pro výběr programů se musíte nejprve"
-    login_required_link: "přihlásit přes skautIS"
+    login_required_link: "přihlásit se"
     login_required_end: "."
     register_programs_not_allowed: "Zapisování programů není v tuto chvíli povoleno."
     register_programs_allowed_from_to: "Zapisování programů je povoleno od %from% do %to%."

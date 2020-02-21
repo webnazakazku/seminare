@@ -16,6 +16,7 @@ use Nette\Localization\ITranslator;
  */
 class UserService
 {
+
     use Nette\SmartObject;
 
     /** @var ITranslator */
@@ -27,36 +28,16 @@ class UserService
     }
 
     /**
-     * Vrací informaci o členství jako text.
-     */
-    public function getMembershipText(User $user) : string
-    {
-        if ($user->getUnit() !== null) {
-            return $user->getUnit();
-        }
-
-        if ($user->isMember()) {
-            return $this->translator->translate('admin.users.users_membership_no');
-        }
-
-        if ($user->isExternalLector()) {
-            return $this->translator->translate('admin.users.users_membership_external');
-        }
-
-        return $this->translator->translate('admin.users.users_membership_not_connected');
-    }
-
-    /**
      * Vrací platební metodu uživatele.
      */
-    public function getPaymentMethod(User $user) : ?string
+    public function getPaymentMethod(User $user): ?string
     {
         $paymentMethod = null;
 
         foreach ($user->getNotCanceledApplications() as $application) {
             $currentPaymentMethod = $application->getPaymentMethod();
             if ($currentPaymentMethod) {
-                if (! $paymentMethod) {
+                if (!$paymentMethod) {
                     $paymentMethod = $currentPaymentMethod;
                 } elseif ($paymentMethod !== $currentPaymentMethod) {
                     return PaymentType::MIXED;
@@ -70,4 +51,5 @@ class UserService
 
         return null;
     }
+
 }

@@ -19,8 +19,9 @@ use Nettrine\ORM\Entity\Attributes\Id;
  */
 class Template
 {
+
     /**
-     * Přihlášení přes skautIS.
+     * Přihlášení.
      */
     public const SIGN_IN = 'sign_in';
 
@@ -73,6 +74,7 @@ class Template
      * Potvrzení změny vlastního pole.
      */
     public const CUSTOM_INPUT_VALUE_CHANGED = 'custom_input_value_changed';
+
     use Id;
 
     /**
@@ -152,47 +154,47 @@ class Template
         $this->variables = new ArrayCollection();
     }
 
-    public function getId() : int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getType() : string
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function setType(string $type) : void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
 
-    public function getSubject() : string
+    public function getSubject(): string
     {
         return $this->subject;
     }
 
-    public function setSubject(string $subject) : void
+    public function setSubject(string $subject): void
     {
         $this->subject = $subject;
     }
 
-    public function getText() : string
+    public function getText(): string
     {
         return $this->text;
     }
 
-    public function setText(string $text) : void
+    public function setText(string $text): void
     {
         $this->text = $text;
     }
 
-    public function isActive() : bool
+    public function isActive(): bool
     {
         return $this->active;
     }
 
-    public function setActive(bool $active) : void
+    public function setActive(bool $active): void
     {
         $this->active = $active;
     }
@@ -200,33 +202,34 @@ class Template
     /**
      * @return Collection|TemplateVariable[]
      */
-    public function getVariables() : Collection
+    public function getVariables(): Collection
     {
         return $this->variables;
     }
 
-    public function isSendToUser() : bool
+    public function isSendToUser(): bool
     {
         return $this->sendToUser;
     }
 
-    public function setSendToUser(bool $sendToUser) : void
+    public function setSendToUser(bool $sendToUser): void
     {
         $this->sendToUser = $sendToUser;
     }
 
-    public function isSendToOrganizer() : bool
+    public function isSendToOrganizer(): bool
     {
         return $this->sendToOrganizer;
     }
 
-    public function setSendToOrganizer(bool $sendToOrganizer) : void
+    public function setSendToOrganizer(bool $sendToOrganizer): void
     {
         $this->sendToOrganizer = $sendToOrganizer;
     }
 
-    public function isSystem() : bool
+    public function isSystem(): bool
     {
         return $this->system;
     }
+
 }

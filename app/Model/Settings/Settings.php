@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Settings
 {
+
     /**
      * Administrátor byl vytvořen.
      */
@@ -71,21 +72,6 @@ class Settings
      * Povoleno přidávání podakcí po zaplacení.
      */
     public const IS_ALLOWED_ADD_SUBEVENTS_AFTER_PAYMENT = 'is_allowed_add_subevents_after_payment';
-
-    /**
-     * Id propojené skautIS akce.
-     */
-    public const SKAUTIS_EVENT_ID = 'skautis_event_id';
-
-    /**
-     * Typ propojené skautIS akce.
-     */
-    public const SKAUTIS_EVENT_TYPE = 'skautis_event_type';
-
-    /**
-     * Název propojené skautIS akce.
-     */
-    public const SKAUTIS_EVENT_NAME = 'skautis_event_name';
 
     /**
      * Adresa obrázku s logem.
@@ -217,7 +203,6 @@ class Settings
      */
     public const GA_ID = 'ga_id';
 
-
     /**
      * Název položky nastavení.
      *
@@ -239,17 +224,18 @@ class Settings
 
     public function __construct(string $item, ?string $value)
     {
-        $this->item  = $item;
+        $this->item = $item;
         $this->value = $value;
     }
 
-    public function getValue() : ?string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue(?string $value) : void
+    public function setValue(?string $value): void
     {
         $this->value = $value;
     }
+
 }

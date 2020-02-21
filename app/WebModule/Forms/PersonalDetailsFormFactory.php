@@ -7,12 +7,10 @@ namespace App\WebModule\Forms;
 use App\Model\Enums\Sex;
 use App\Model\User\User;
 use App\Model\User\UserRepository;
-use App\Services\SkautIsService;
 use Doctrine\ORM\ORMException;
 use Nette;
 use Nette\Application\UI\Form;
 use Nextras\FormComponents\Controls\DateControl;
-use Skautis\Wsdl\WsdlException;
 use stdClass;
 use Tracy\Debugger;
 use Tracy\ILogger;
@@ -27,6 +25,7 @@ use function property_exists;
  */
 class PersonalDetailsFormFactory
 {
+
     use Nette\SmartObject;
 
     /**
@@ -36,29 +35,22 @@ class PersonalDetailsFormFactory
      */
     private $user;
 
-    /** @var callable[] */
-    public $onSkautIsError;
-
     /** @var BaseFormFactory */
     private $baseFormFactory;
 
     /** @var UserRepository */
     private $userRepository;
 
-    /** @var SkautIsService */
-    private $skautIsService;
-
-    public function __construct(BaseFormFactory $baseFormFactory, UserRepository $userRepository, SkautIsService $skautIsService)
+    public function __construct(BaseFormFactory $baseFormFactory, UserRepository $userRepository)
     {
         $this->baseFormFactory = $baseFormFactory;
-        $this->userRepository  = $userRepository;
-        $this->skautIsService  = $skautIsService;
+        $this->userRepository = $userRepository;
     }
 
     /**
      * Vytvoří formulář.
      */
-    public function create(int $id) : Form
+    public function create(int $id): Form
     {
         $this->user = $this->userRepository->findById($id);
 
@@ -69,10 +61,10 @@ class PersonalDetailsFormFactory
         $inputSex = $form->addRadioList('sex', 'web.profile.sex', Sex::getSexOptions());
 
         $inputFirstName = $form->addText('firstName', 'web.profile.firstname')
-            ->addRule(Form::FILLED, 'web.profile.firstname_empty');
+                ->addRule(Form::FILLED, 'web.profile.firstname_empty');
 
         $inputLastName = $form->addText('lastName', 'web.profile.lastname')
-            ->addRule(Form::FILLED, 'web.profile.lastname_empty');
+                ->addRule(Form::FILLED, 'web.profile.lastname_empty');
 
         $inputNickName = $form->addText('nickName', 'web.profile.nickname');
 
@@ -80,31 +72,29 @@ class PersonalDetailsFormFactory
         $inputBirthdateDate->addRule(Form::FILLED, 'web.profile.birthdate_empty');
         $form->addComponent($inputBirthdateDate, 'birthdate');
 
-        if ($this->user->isMember()) {
-            $inputSex->setDisabled();
-            $inputFirstName->setDisabled();
-            $inputLastName->setDisabled();
-            $inputNickName->setDisabled();
-            $inputBirthdateDate->setDisabled();
-        }
+        $inputSex->setDisabled();
+        $inputFirstName->setDisabled();
+        $inputLastName->setDisabled();
+        $inputNickName->setDisabled();
+        $inputBirthdateDate->setDisabled();
 
         $form->addText('email', 'web.application_content.email')
-            ->addRule(Form::FILLED)
-            ->setDisabled();
+                ->addRule(Form::FILLED)
+                ->setDisabled();
 
         $form->addText('street', 'web.profile.street')
-            ->addRule(Form::FILLED, 'web.profile.street_empty')
-            ->addRule(Form::PATTERN, 'web.profile.street_format', '^(.*[^0-9]+) (([1-9][0-9]*)/)?([1-9][0-9]*[a-cA-C]?)$');
+                ->addRule(Form::FILLED, 'web.profile.street_empty')
+                ->addRule(Form::PATTERN, 'web.profile.street_format', '^(.*[^0-9]+) (([1-9][0-9]*)/)?([1-9][0-9]*[a-cA-C]?)$');
 
         $form->addText('city', 'web.profile.city')
-            ->addRule(Form::FILLED, 'web.profile.city_empty');
+                ->addRule(Form::FILLED, 'web.profile.city_empty');
 
         $form->addText('postcode', 'web.profile.postcode')
-            ->addRule(Form::FILLED, 'web.profile.postcode_empty')
-            ->addRule(Form::PATTERN, 'web.profile.postcode_format', '^\d{3} ?\d{2}$');
+                ->addRule(Form::FILLED, 'web.profile.postcode_empty')
+                ->addRule(Form::PATTERN, 'web.profile.postcode_format', '^\d{3} ?\d{2}$');
 
         $form->addText('state', 'web.profile.state')
-            ->addRule(Form::FILLED, 'web.profile.state_empty');
+                ->addRule(Form::FILLED, 'web.profile.state_empty');
 
         $form->addSubmit('submit', 'web.profile.update_personal_details');
 
@@ -132,7 +122,7 @@ class PersonalDetailsFormFactory
      *
      * @throws ORMException
      */
-    public function processForm(Form $form, stdClass $values) : void
+    public function processForm(Form $form, stdClass $values): void
     {
         if (property_exists($values, 'sex')) {
             $this->user->setSex($values->sex);
@@ -160,27 +150,6 @@ class PersonalDetailsFormFactory
         $this->user->setState($values->state);
 
         $this->userRepository->save($this->user);
-
-        try {
-            $this->skautIsService->updatePersonBasic(
-                $this->user->getSkautISPersonId(),
-                $this->user->getSex(),
-                $this->user->getBirthdate(),
-                $this->user->getFirstName(),
-                $this->user->getLastName(),
-                $this->user->getNickName()
-            );
-
-            $this->skautIsService->updatePersonAddress(
-                $this->user->getSkautISPersonId(),
-                $this->user->getStreet(),
-                $this->user->getCity(),
-                $this->user->getPostcode(),
-                $this->user->getState()
-            );
-        } catch (WsdlException $ex) {
-            Debugger::log($ex, ILogger::WARNING);
-            $this->onSkautIsError();
-        }
     }
+
 }

@@ -106,14 +106,6 @@ register_programs_type:
     not_allowed: "Zakázáno"
     allowed_from_to: "Od do"
 
-skautis_event_type:
-    general: "Obecná akce"
-    education: "Vzdělávací akce"
-
-skautis_event_insert_type:
-    registered: "Přihlášení"
-    accepted: "Přijatí"
-
 application_state:
     waiting_for_payment: "Čeká na platbu"
     canceled_not_paid: "Zrušeno (nezaplaceno)"
@@ -168,10 +160,6 @@ export:
         roles: "Role"
         subevents: "Podakce"
         approved: "Schválený"
-        membership: "Členství"
-        membership_no: "nečlen"
-        membership_not_connected: "nepropojený účet"
-        membership_external: "externí lektor"
         email: "E-mail"
         age: "Věk"
         city: "Město"
@@ -196,7 +184,7 @@ export:
 
 mailing:
     template_type:
-        sign_in: "Potvrzení přihlášení se přes skautIS"
+        sign_in: "Potvrzení přihlášení"
         registration: "Potvrzení registrace"
         registration_canceled: "Potvrzení zrušení registrace"
         roles_changed: "Potvrzení změny rolí"

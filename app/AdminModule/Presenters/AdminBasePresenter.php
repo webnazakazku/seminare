@@ -14,7 +14,6 @@ use App\Model\User\UserRepository;
 use App\Presenters\BasePresenter;
 use App\Services\Authorizator;
 use App\Services\SettingsService;
-use App\Services\SkautIsService;
 use Nette\Application\AbortException;
 use Throwable;
 use WebLoader\Nette\CssLoader;
@@ -29,6 +28,7 @@ use function array_keys;
  */
 abstract class AdminBasePresenter extends BasePresenter
 {
+
     /** @var string */
     protected $resource = SrsResource::ADMIN;
 
@@ -57,12 +57,6 @@ abstract class AdminBasePresenter extends BasePresenter
     public $userRepository;
 
     /**
-     * @var SkautIsService
-     * @inject
-     */
-    public $skautIsService;
-
-    /**
      * Přihlášený uživatel.
      *
      * @var User
@@ -72,7 +66,7 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * Načte css podle konfigurace v common.neon.
      */
-    protected function createComponentCss() : CssLoader
+    protected function createComponentCss(): CssLoader
     {
         return $this->webLoader->createCssLoader('admin');
     }
@@ -80,7 +74,7 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * Načte javascript podle konfigurace v common.neon.
      */
-    protected function createComponentJs() : JavaScriptLoader
+    protected function createComponentJs(): JavaScriptLoader
     {
         return $this->webLoader->createJavaScriptLoader('admin');
     }
@@ -88,21 +82,17 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * @throws AbortException
      */
-    public function startup() : void
+    public function startup(): void
     {
         parent::startup();
 
-        if ($this->user->isLoggedIn() && ! $this->skautIsService->isLoggedIn()) {
-            $this->user->logout(true);
-        }
-
         $this->user->setAuthorizator($this->authorizator);
 
-        if (! $this->user->isLoggedIn()) {
+        if (!$this->user->isLoggedIn()) {
             $this->redirect(':Auth:login', ['backlink' => $this->getHttpRequest()->getUrl()->getPath()]);
         }
 
-        if (! $this->user->isAllowed(SrsResource::ADMIN, Permission::ACCESS)) {
+        if (!$this->user->isAllowed(SrsResource::ADMIN, Permission::ACCESS)) {
             $this->flashMessage('admin.common.access_denied', 'danger', 'lock');
             $this->redirect(':Web:Page:default');
         }
@@ -114,48 +104,35 @@ abstract class AdminBasePresenter extends BasePresenter
      * @throws SettingsException
      * @throws Throwable
      */
-    public function beforeRender() : void
+    public function beforeRender(): void
     {
         parent::beforeRender();
 
         $this->template->dbuser = $this->dbuser;
 
-        $this->template->resourceAcl           = SrsResource::ACL;
-        $this->template->resourceCms           = SrsResource::CMS;
+        $this->template->resourceAcl = SrsResource::ACL;
+        $this->template->resourceCms = SrsResource::CMS;
         $this->template->resourceConfiguration = SrsResource::CONFIGURATION;
-        $this->template->resourceUsers         = SrsResource::USERS;
-        $this->template->resourcePayments      = SrsResource::PAYMENTS;
-        $this->template->resourceMailing       = SrsResource::MAILING;
-        $this->template->resourceProgram       = SrsResource::PROGRAM;
+        $this->template->resourceUsers = SrsResource::USERS;
+        $this->template->resourcePayments = SrsResource::PAYMENTS;
+        $this->template->resourceMailing = SrsResource::MAILING;
+        $this->template->resourceProgram = SrsResource::PROGRAM;
 
-        $this->template->permissionAccess            = Permission::ACCESS;
-        $this->template->permissionManage            = Permission::MANAGE;
+        $this->template->permissionAccess = Permission::ACCESS;
+        $this->template->permissionManage = Permission::MANAGE;
         $this->template->permissionManageOwnPrograms = Permission::MANAGE_OWN_PROGRAMS;
         $this->template->permissionManageAllPrograms = Permission::MANAGE_ALL_PROGRAMS;
-        $this->template->permissionManageSchedule    = Permission::MANAGE_SCHEDULE;
-        $this->template->permissionManageRooms       = Permission::MANAGE_ROOMS;
-        $this->template->permissionManageCategories  = Permission::MANAGE_CATEGORIES;
-        $this->template->permissionChoosePrograms    = Permission::CHOOSE_PROGRAMS;
+        $this->template->permissionManageSchedule = Permission::MANAGE_SCHEDULE;
+        $this->template->permissionManageRooms = Permission::MANAGE_ROOMS;
+        $this->template->permissionManageCategories = Permission::MANAGE_CATEGORIES;
+        $this->template->permissionChoosePrograms = Permission::CHOOSE_PROGRAMS;
 
-        $this->template->footer      = $this->settingsService->getValue(Settings::FOOTER);
+        $this->template->footer = $this->settingsService->getValue(Settings::FOOTER);
         $this->template->seminarName = $this->settingsService->getValue(Settings::SEMINAR_NAME);
 
         $this->template->settings = $this->settingsService;
 
         $this->template->containerAttributes = '';
-
-        $skautIsUserId                = $this->dbuser->getSkautISUserId();
-        $skautIsRoles                 = $this->skautIsService->getUserRoles($skautIsUserId);
-        $skautIsRoleSelectedId        = $this->skautIsService->getUserRoleId();
-        $skautIsRoleSelected          = array_filter($skautIsRoles, static function ($r) use ($skautIsRoleSelectedId) {
-            return $r->ID === $skautIsRoleSelectedId;
-        });
-        $this->template->skautIsRoles = $skautIsRoles;
-        if (empty($skautIsRoleSelected)) {
-            $this->template->skautIsRoleSelected = null;
-        } else {
-            $this->template->skautIsRoleSelected = $skautIsRoleSelected[array_keys($skautIsRoleSelected)[0]];
-        }
     }
 
     /**
@@ -163,9 +140,9 @@ abstract class AdminBasePresenter extends BasePresenter
      *
      * @throws AbortException
      */
-    public function checkPermission(string $permission) : void
+    public function checkPermission(string $permission): void
     {
-        if (! $this->user->isAllowed($this->resource, $permission)) {
+        if (!$this->user->isAllowed($this->resource, $permission)) {
             $this->flashMessage('admin.common.access_denied', 'danger', 'lock');
             $this->redirect(':Admin:Dashboard:default');
         }
@@ -174,9 +151,9 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * @throws AbortException
      */
-    public function handleChangeRole(int $roleId) : void
+    public function handleChangeRole(int $roleId): void
     {
-        $this->skautIsService->updateUserRole($roleId);
         $this->redirect('this');
     }
+
 }

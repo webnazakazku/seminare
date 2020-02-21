@@ -39,6 +39,7 @@ use function preg_replace;
  */
 class ExcelExportService
 {
+
     use Nette\SmartObject;
 
     /** @var Spreadsheet */
@@ -63,21 +64,22 @@ class ExcelExportService
     private $programRepository;
 
     public function __construct(
-        ITranslator $translator,
-        CustomInputRepository $customInputRepository,
-        UserService $userService,
-        SubeventRepository $subeventRepository,
-        CategoryRepository $categoryRepository,
-        ProgramRepository $programRepository
-    ) {
+            ITranslator $translator,
+            CustomInputRepository $customInputRepository,
+            UserService $userService,
+            SubeventRepository $subeventRepository,
+            CategoryRepository $categoryRepository,
+            ProgramRepository $programRepository
+    )
+    {
         $this->spreadsheet = new Spreadsheet();
 
-        $this->translator            = $translator;
+        $this->translator = $translator;
         $this->customInputRepository = $customInputRepository;
-        $this->userService           = $userService;
-        $this->subeventRepository    = $subeventRepository;
-        $this->categoryRepository    = $categoryRepository;
-        $this->programRepository     = $programRepository;
+        $this->userService = $userService;
+        $this->subeventRepository = $subeventRepository;
+        $this->categoryRepository = $categoryRepository;
+        $this->programRepository = $programRepository;
     }
 
     /**
@@ -88,11 +90,11 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportUsersRoles(Collection $users, Collection $roles, string $filename) : ExcelResponse
+    public function exportUsersRoles(Collection $users, Collection $roles, string $filename): ExcelResponse
     {
         $sheet = $this->spreadsheet->getSheet(0);
 
-        $row    = 1;
+        $row = 1;
         $column = 1;
 
         $sheet->getColumnDimensionByColumn($column)->setAutoSize(false);
@@ -128,7 +130,7 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportUserSchedule(User $user, string $filename) : ExcelResponse
+    public function exportUserSchedule(User $user, string $filename): ExcelResponse
     {
         return $this->exportUsersSchedules(new ArrayCollection([$user]), $filename);
     }
@@ -141,7 +143,7 @@ class ExcelExportService
      * @throws Exception
      * @throws Exception
      */
-    public function exportUsersSchedules(Collection $users, string $filename) : ExcelResponse
+    public function exportUsersSchedules(Collection $users, string $filename): ExcelResponse
     {
         $this->spreadsheet->removeSheetByIndex(0);
         $sheetNumber = 0;
@@ -150,7 +152,7 @@ class ExcelExportService
             $sheet = new Worksheet($this->spreadsheet, self::cleanSheetName($user->getDisplayName()));
             $this->spreadsheet->addSheet($sheet, $sheetNumber++);
 
-            $row    = 1;
+            $row = 1;
             $column = 1;
 
             $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.schedule.from'));
@@ -198,7 +200,7 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportRoomSchedule(Room $room, string $filename) : ExcelResponse
+    public function exportRoomSchedule(Room $room, string $filename): ExcelResponse
     {
         return $this->exportRoomsSchedules(new ArrayCollection([$room]), $filename);
     }
@@ -210,7 +212,7 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportRoomsSchedules(Collection $rooms, string $filename) : ExcelResponse
+    public function exportRoomsSchedules(Collection $rooms, string $filename): ExcelResponse
     {
         $this->spreadsheet->removeSheetByIndex(0);
         $sheetNumber = 0;
@@ -219,7 +221,7 @@ class ExcelExportService
             $sheet = new Worksheet($this->spreadsheet, self::cleanSheetName($room->getName()));
             $this->spreadsheet->addSheet($sheet, $sheetNumber++);
 
-            $row    = 1;
+            $row = 1;
             $column = 1;
 
             $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.schedule.from'));
@@ -249,9 +251,7 @@ class ExcelExportService
                 $sheet->setCellValueByColumnAndRow($column++, $row, $program->getStart()->format('j. n. H:i'));
                 $sheet->setCellValueByColumnAndRow($column++, $row, $program->getEnd()->format('j. n. H:i'));
                 $sheet->setCellValueByColumnAndRow($column++, $row, $program->getBlock()->getName());
-                $sheet->setCellValueByColumnAndRow($column++, $row, $room->getCapacity() !== null
-                    ? $program->getAttendeesCount() . '/' . $room->getCapacity()
-                    : $program->getAttendeesCount());
+                $sheet->setCellValueByColumnAndRow($column++, $row, $room->getCapacity() !== null ? $program->getAttendeesCount() . '/' . $room->getCapacity() : $program->getAttendeesCount());
             }
         }
 
@@ -263,11 +263,11 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportUsersList(Collection $users, string $filename) : ExcelResponse
+    public function exportUsersList(Collection $users, string $filename): ExcelResponse
     {
         $sheet = $this->spreadsheet->getSheet(0);
 
-        $row    = 1;
+        $row = 1;
         $column = 1;
 
         $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.user.display_name'));
@@ -294,11 +294,6 @@ class ExcelExportService
         $sheet->getStyleByColumnAndRow($column, $row)->getFont()->setBold(true);
         $sheet->getColumnDimensionByColumn($column)->setAutoSize(false);
         $sheet->getColumnDimensionByColumn($column++)->setWidth(10);
-
-        $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.user.membership'));
-        $sheet->getStyleByColumnAndRow($column, $row)->getFont()->setBold(true);
-        $sheet->getColumnDimensionByColumn($column)->setAutoSize(false);
-        $sheet->getColumnDimensionByColumn($column++)->setWidth(20);
 
         $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.user.age'));
         $sheet->getStyleByColumnAndRow($column, $row)->getFont()->setBold(true);
@@ -401,12 +396,7 @@ class ExcelExportService
 
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getSubeventsText());
 
-            $sheet->setCellValueByColumnAndRow($column++, $row, $user->isApproved()
-                ? $this->translator->translate('common.export.common.yes')
-                : $this->translator->translate('common.export.common.no'));
-
-            $sheet->getCellByColumnAndRow($column++, $row)
-                ->setValueExplicit($this->userService->getMembershipText($user), DataType::TYPE_STRING);
+            $sheet->setCellValueByColumnAndRow($column++, $row, $user->isApproved() ? $this->translator->translate('common.export.common.yes') : $this->translator->translate('common.export.common.no'));
 
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getAge());
 
@@ -419,7 +409,7 @@ class ExcelExportService
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getFeeRemaining());
 
             $sheet->getCellByColumnAndRow($column++, $row)
-                ->setValueExplicit($user->getVariableSymbolsText(), DataType::TYPE_STRING);
+                    ->setValueExplicit($user->getVariableSymbolsText(), DataType::TYPE_STRING);
 
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getPaymentMethod() ? $this->translator->translate('common.payment.' . $user->getPaymentMethod()) : '');
 
@@ -427,9 +417,7 @@ class ExcelExportService
 
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getRolesApplicationDate() !== null ? $user->getRolesApplicationDate()->format(Helpers::DATE_FORMAT) : '');
 
-            $sheet->setCellValueByColumnAndRow($column++, $row, $user->isAttended()
-                ? $this->translator->translate('common.export.common.yes')
-                : $this->translator->translate('common.export.common.no'));
+            $sheet->setCellValueByColumnAndRow($column++, $row, $user->isAttended() ? $this->translator->translate('common.export.common.yes') : $this->translator->translate('common.export.common.no'));
 
 //            $sheet->setCellValueByColumnAndRow($column++, $row, $user->getNotRegisteredMandatoryBlocksText());
 
@@ -439,9 +427,7 @@ class ExcelExportService
                 if ($customInputValue instanceof CustomTextValue) {
                     $value = $customInputValue->getValue();
                 } elseif ($customInputValue instanceof CustomCheckboxValue) {
-                    $value = $customInputValue->getValue()
-                        ? $this->translator->translate('common.export.common.yes')
-                        : $this->translator->translate('common.export.common.no');
+                    $value = $customInputValue->getValue() ? $this->translator->translate('common.export.common.yes') : $this->translator->translate('common.export.common.no');
                 } elseif ($customInputValue instanceof CustomSelectValue) {
                     $value = $customInputValue->getValueOption();
                 } elseif ($customInputValue instanceof CustomFileValue) {
@@ -465,11 +451,11 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportUsersSubeventsAndCategories(Collection $users, string $filename) : ExcelResponse
+    public function exportUsersSubeventsAndCategories(Collection $users, string $filename): ExcelResponse
     {
         $sheet = $this->spreadsheet->getSheet(0);
 
-        $row    = 1;
+        $row = 1;
         $column = 1;
 
         $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.user.variable_symbol'));
@@ -516,7 +502,7 @@ class ExcelExportService
             $column = 1;
 
             $sheet->getCellByColumnAndRow($column++, $row)
-                ->setValueExplicit($user->getVariableSymbolsText(), DataType::TYPE_STRING);
+                    ->setValueExplicit($user->getVariableSymbolsText(), DataType::TYPE_STRING);
 
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getFirstName());
 
@@ -525,17 +511,15 @@ class ExcelExportService
             $sheet->setCellValueByColumnAndRow($column++, $row, $user->getNickname());
 
             foreach ($this->subeventRepository->findExplicitOrderedByName() as $subevent) {
-                $sheet->setCellValueByColumnAndRow($column++, $row, $user->hasSubevent($subevent)
-                    ? $this->translator->translate('common.export.common.yes')
-                    : $this->translator->translate('common.export.common.no'));
+                $sheet->setCellValueByColumnAndRow($column++, $row, $user->hasSubevent($subevent) ? $this->translator->translate('common.export.common.yes') : $this->translator->translate('common.export.common.no'));
             }
 
             foreach ($this->categoryRepository->findAll() as $category) {
                 $blocks = [];
-                $rooms  = [];
+                $rooms = [];
                 foreach ($this->programRepository->findUserRegisteredAndInCategory($user, $category) as $program) {
                     $blocks[] = $program->getBlock()->getName();
-                    $rooms[]  = $program->getRoom() ? $program->getRoom()->getName() : '';
+                    $rooms[] = $program->getRoom() ? $program->getRoom()->getName() : '';
                 }
 
                 $sheet->setCellValueByColumnAndRow($column++, $row, implode(', ', $blocks));
@@ -551,7 +535,7 @@ class ExcelExportService
      *
      * @throws Exception
      */
-    public function exportBlocksAttendees(Collection $blocks, string $filename) : ExcelResponse
+    public function exportBlocksAttendees(Collection $blocks, string $filename): ExcelResponse
     {
         $this->spreadsheet->removeSheetByIndex(0);
         $sheetNumber = 0;
@@ -560,7 +544,7 @@ class ExcelExportService
             $sheet = new Worksheet($this->spreadsheet, self::cleanSheetName($block->getName()));
             $this->spreadsheet->addSheet($sheet, $sheetNumber++);
 
-            $row    = 1;
+            $row = 1;
             $column = 1;
 
             $sheet->setCellValueByColumnAndRow($column, $row, $this->translator->translate('common.export.user.display_name'));
@@ -597,7 +581,7 @@ class ExcelExportService
      * Odstraní z názvu listu zakázané znaky a zkrátí jej.
      * Excel podporuje 31 znaků, při duplicitních názvech doplní na poslední pozici číslo.
      */
-    private static function cleanSheetName(string $name) : string
+    private static function cleanSheetName(string $name): string
     {
         $name = preg_replace('#[]]#', ')', $name);
         $name = preg_replace('#[[]#', '(', $name);
@@ -606,4 +590,5 @@ class ExcelExportService
 
         return Helpers::truncate($name, 29);
     }
+
 }

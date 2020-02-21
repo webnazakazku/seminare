@@ -31,6 +31,7 @@ use Throwable;
  */
 class ProfilePresenter extends WebBasePresenter
 {
+
     /**
      * @var PersonalDetailsFormFactory
      * @inject
@@ -89,11 +90,11 @@ class ProfilePresenter extends WebBasePresenter
      * @throws AbortException
      * @throws Throwable
      */
-    public function startup() : void
+    public function startup(): void
     {
         parent::startup();
 
-        if (! $this->user->isLoggedIn()) {
+        if (!$this->user->isLoggedIn()) {
             $this->flashMessage('web.common.login_required', 'danger', 'lock');
             $this->redirect(':Web:Page:default');
         }
@@ -103,10 +104,10 @@ class ProfilePresenter extends WebBasePresenter
      * @throws SettingsException
      * @throws Throwable
      */
-    public function renderDefault() : void
+    public function renderDefault(): void
     {
-        $this->template->pageName                  = $this->translator->translate('web.profile.title');
-        $this->template->paymentMethodBank         = PaymentType::BANK;
+        $this->template->pageName = $this->translator->translate('web.profile.title');
+        $this->template->paymentMethodBank = PaymentType::BANK;
         $this->template->isAllowedEditCustomInputs = $this->applicationService->isAllowedEditCustomInputs();
     }
 
@@ -116,35 +117,31 @@ class ProfilePresenter extends WebBasePresenter
      * @throws AbortException
      * @throws Exception
      */
-    public function actionExportSchedule() : void
+    public function actionExportSchedule(): void
     {
-        $user     = $this->userRepository->findById($this->user->id);
+        $user = $this->userRepository->findById($this->user->id);
         $response = $this->excelExportService->exportUserSchedule($user, 'harmonogram-seminare.xlsx');
         $this->sendResponse($response);
     }
 
-    protected function createComponentPersonalDetailsForm() : Form
+    protected function createComponentPersonalDetailsForm(): Form
     {
         $form = $this->personalDetailsFormFactory->create($this->user->id);
 
-        $form->onSuccess[] = function (Form $form, stdClass $values) : void {
+        $form->onSuccess[] = function (Form $form, stdClass $values): void {
             $this->flashMessage('web.profile.personal_details_update_successful', 'success');
 
             $this->redirect('this#personal-details');
         };
 
-        $this->personalDetailsFormFactory->onSkautIsError[] = function () : void {
-            $this->flashMessage('web.profile.personal_details_synchronization_failed', 'danger');
-        };
-
         return $form;
     }
 
-    protected function createComponentAdditionalInformationForm() : AdditionalInformationForm
+    protected function createComponentAdditionalInformationForm(): AdditionalInformationForm
     {
         $control = $this->additionalInformationFormFactory->create();
 
-        $control->onSave[] = function () : void {
+        $control->onSave[] = function (): void {
             $this->flashMessage('web.profile.additional_information_update_successfull', 'success');
             $this->redirect('this#additional-information');
         };
@@ -156,11 +153,11 @@ class ProfilePresenter extends WebBasePresenter
      * @throws SettingsException
      * @throws Throwable
      */
-    protected function createComponentRolesForm() : Form
+    protected function createComponentRolesForm(): Form
     {
         $form = $this->rolesFormFactory->create($this->user->id);
 
-        $form->onSuccess[] = function (Form $form, stdClass $values) : void {
+        $form->onSuccess[] = function (Form $form, stdClass $values): void {
             if ($form->isSubmitted() === $form['submit']) {
                 $this->flashMessage('web.profile.roles_changed', 'success');
             } elseif ($form->isSubmitted() === $form['cancelRegistration']) {
@@ -176,8 +173,9 @@ class ProfilePresenter extends WebBasePresenter
         return $form;
     }
 
-    protected function createComponentApplicationsGrid() : ApplicationsGridControl
+    protected function createComponentApplicationsGrid(): ApplicationsGridControl
     {
         return $this->applicationsGridControlFactory->create();
     }
+
 }

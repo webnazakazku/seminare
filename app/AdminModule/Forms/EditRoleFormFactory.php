@@ -34,6 +34,7 @@ use function in_array;
  */
 class EditRoleFormFactory
 {
+
     use Nette\SmartObject;
 
     /**
@@ -65,21 +66,22 @@ class EditRoleFormFactory
     private $programService;
 
     public function __construct(
-        BaseFormFactory $baseFormFactory,
-        EntityManagerDecorator $em,
-        AclService $aclService,
-        RoleRepository $roleRepository,
-        PageRepository $pageRepository,
-        PermissionRepository $permissionRepository,
-        ProgramService $programService
-    ) {
-        $this->baseFormFactory      = $baseFormFactory;
-        $this->em                   = $em;
-        $this->aclService           = $aclService;
-        $this->roleRepository       = $roleRepository;
-        $this->pageRepository       = $pageRepository;
+            BaseFormFactory $baseFormFactory,
+            EntityManagerDecorator $em,
+            AclService $aclService,
+            RoleRepository $roleRepository,
+            PageRepository $pageRepository,
+            PermissionRepository $permissionRepository,
+            ProgramService $programService
+    )
+    {
+        $this->baseFormFactory = $baseFormFactory;
+        $this->em = $em;
+        $this->aclService = $aclService;
+        $this->roleRepository = $roleRepository;
+        $this->pageRepository = $pageRepository;
         $this->permissionRepository = $permissionRepository;
-        $this->programService       = $programService;
+        $this->programService = $programService;
     }
 
     /**
@@ -88,7 +90,7 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function create(int $id) : Form
+    public function create(int $id): Form
     {
         $this->role = $this->roleRepository->findById($id);
 
@@ -97,45 +99,43 @@ class EditRoleFormFactory
         $form->addHidden('id');
 
         $form->addText('name', 'admin.acl.roles_name')
-            ->addRule(Form::FILLED, 'admin.acl.roles_name_empty')
-            ->addRule(Form::IS_NOT_IN, 'admin.acl.roles_name_exists', $this->roleRepository->findOthersNames($id))
-            ->addRule(Form::NOT_EQUAL, 'admin.acl.roles_name_reserved', 'test');
+                ->addRule(Form::FILLED, 'admin.acl.roles_name_empty')
+                ->addRule(Form::IS_NOT_IN, 'admin.acl.roles_name_exists', $this->roleRepository->findOthersNames($id))
+                ->addRule(Form::NOT_EQUAL, 'admin.acl.roles_name_reserved', 'test');
 
         $form->addCheckbox('registerable', 'admin.acl.roles_registerable_form');
 
         $registerableFromDateTime = new DateTimeControl('admin.acl.roles_registerable_from');
         $registerableFromDateTime
-            ->setHtmlAttribute('data-toggle', 'tooltip')
-            ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_registerable_from_note'));
+                ->setHtmlAttribute('data-toggle', 'tooltip')
+                ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_registerable_from_note'));
         $form->addComponent($registerableFromDateTime, 'registerableFrom');
 
         $registerableToDateTime = new DateTimeControl('admin.acl.roles_registerable_to');
         $registerableToDateTime
-            ->setHtmlAttribute('data-toggle', 'tooltip')
-            ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_registerable_to_note'));
+                ->setHtmlAttribute('data-toggle', 'tooltip')
+                ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_registerable_to_note'));
         $form->addComponent($registerableToDateTime, 'registerableTo');
 
         $form->addText('capacity', 'admin.acl.roles_capacity')
-            ->setHtmlAttribute('data-toggle', 'tooltip')
-            ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_capacity_note'))
-            ->addCondition(Form::FILLED)
-            ->addRule(Form::INTEGER, 'admin.acl.roles_capacity_format')
-            ->addRule(Form::MIN, 'admin.acl.roles_capacity_low', $this->role->countUsers());
+                ->setHtmlAttribute('data-toggle', 'tooltip')
+                ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_capacity_note'))
+                ->addCondition(Form::FILLED)
+                ->addRule(Form::INTEGER, 'admin.acl.roles_capacity_format')
+                ->addRule(Form::MIN, 'admin.acl.roles_capacity_low', $this->role->countUsers());
 
         $form->addCheckbox('approvedAfterRegistration', 'admin.acl.roles_approved_after_registration');
-
-        // $form->addCheckbox('syncedWithSkautIs', 'admin.acl.roles_synced_with_skaut_is');
 
         $form->addCheckbox('displayArrivalDeparture', 'admin.acl.roles_display_arrival_departure');
 
         $form->addCheckbox('feeFromSubevents', 'admin.acl.roles_fee_from_subevents_checkbox')
-            ->addCondition(Form::EQUAL, false)
-            ->toggle('fee');
+                ->addCondition(Form::EQUAL, false)
+                ->toggle('fee');
 
         $form->addText('fee', 'admin.acl.roles_fee')
-            ->setOption('id', 'fee')
-            ->addCondition(Form::FILLED)
-            ->addRule(Form::INTEGER, 'admin.acl.roles_fee_format');
+                ->setOption('id', 'fee')
+                ->addCondition(Form::FILLED)
+                ->addRule(Form::INTEGER, 'admin.acl.roles_fee_format');
 
         $form->addMultiSelect('permissions', 'admin.acl.roles_permissions', $this->preparePermissionsOptions());
 
@@ -144,10 +144,10 @@ class EditRoleFormFactory
         $allowedPages = $form->addMultiSelect('pages', 'admin.acl.roles_pages', $pagesOptions);
 
         $form->addSelect('redirectAfterLogin', 'admin.acl.roles_redirect_after_login', $pagesOptions)
-            ->setPrompt('')
-            ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_redirect_after_login_note'))
-            ->addCondition(Form::FILLED)
-            ->addRule([$this, 'validateRedirectAllowed'], 'admin.acl.roles_redirect_after_login_restricted', [$allowedPages]);
+                ->setPrompt('')
+                ->setHtmlAttribute('title', $form->getTranslator()->translate('admin.acl.roles_redirect_after_login_note'))
+                ->addCondition(Form::FILLED)
+                ->addRule([$this, 'validateRedirectAllowed'], 'admin.acl.roles_redirect_after_login_restricted', [$allowedPages]);
 
         $rolesOptions = $this->aclService->getRolesWithoutRoleOptions($this->role->getId());
 
@@ -156,28 +156,28 @@ class EditRoleFormFactory
         $requiredRolesSelect = $form->addMultiSelect('requiredRoles', 'admin.acl.roles_required_roles', $rolesOptions);
 
         $incompatibleRolesSelect
-            ->addCondition(Form::FILLED)
-            ->addRule(
-                [$this, 'validateIncompatibleAndRequiredCollision'],
-                'admin.acl.roles_incompatible_collision',
-                [$incompatibleRolesSelect, $requiredRolesSelect]
-            );
+                ->addCondition(Form::FILLED)
+                ->addRule(
+                        [$this, 'validateIncompatibleAndRequiredCollision'],
+                        'admin.acl.roles_incompatible_collision',
+                        [$incompatibleRolesSelect, $requiredRolesSelect]
+        );
 
         $requiredRolesSelect
-            ->addCondition(Form::FILLED)
-            ->addRule(
-                [$this, 'validateIncompatibleAndRequiredCollision'],
-                'admin.acl.roles_required_collision',
-                [$incompatibleRolesSelect, $requiredRolesSelect]
-            );
+                ->addCondition(Form::FILLED)
+                ->addRule(
+                        [$this, 'validateIncompatibleAndRequiredCollision'],
+                        'admin.acl.roles_required_collision',
+                        [$incompatibleRolesSelect, $requiredRolesSelect]
+        );
 
         $form->addSubmit('submit', 'admin.common.save');
 
         $form->addSubmit('submitAndContinue', 'admin.common.save_and_continue');
 
         $form->addSubmit('cancel', 'admin.common.cancel')
-            ->setValidationScope([])
-            ->setHtmlAttribute('class', 'btn btn-warning');
+                ->setValidationScope([])
+                ->setHtmlAttribute('class', 'btn btn-warning');
 
         $form->setDefaults([
             'id' => $id,
@@ -187,7 +187,6 @@ class EditRoleFormFactory
             'registerableTo' => $this->role->getRegisterableTo(),
             'capacity' => $this->role->getCapacity(),
             'approvedAfterRegistration' => $this->role->isApprovedAfterRegistration(),
-            // 'syncedWithSkautIs' => $this->role->isSyncedWithSkautIS(),
             'displayArrivalDeparture' => $this->role->isDisplayArrivalDeparture(),
             'feeFromSubevents' => $this->role->getFee() === null,
             'fee' => $this->role->getFee(),
@@ -208,13 +207,13 @@ class EditRoleFormFactory
      *
      * @throws Throwable
      */
-    public function processForm(Form $form, stdClass $values) : void
+    public function processForm(Form $form, stdClass $values): void
     {
         if ($form->isSubmitted() === $form['cancel']) {
             return;
         }
 
-        $this->em->transactional(function () use ($values) : void {
+        $this->em->transactional(function () use ($values): void {
             $capacity = $values->capacity !== '' ? $values->capacity : null;
 
             $this->role->setName($values->name);
@@ -223,7 +222,6 @@ class EditRoleFormFactory
             $this->role->setRegisterableTo($values->registerableTo);
             $this->role->setCapacity($capacity);
             $this->role->setApprovedAfterRegistration($values->approvedAfterRegistration);
-            // $this->role->setSyncedWithSkautIS($values->syncedWithSkautIs);
             $this->role->setDisplayArrivalDeparture($values->displayArrivalDeparture);
             $this->role->setPermissions($this->permissionRepository->findPermissionsByIds($values->permissions));
             $this->role->setPages($this->pageRepository->findPagesBySlugs($values->pages));
@@ -251,15 +249,15 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    private function preparePermissionsOptions() : array
+    private function preparePermissionsOptions(): array
     {
         $options = [];
 
-        $groupWebName    = 'common.permission_group.web';
+        $groupWebName = 'common.permission_group.web';
         $optionsGroupWeb = &$options[$groupWebName];
         $this->preparePermissionOption($optionsGroupWeb, Permission::CHOOSE_PROGRAMS, SrsResource::PROGRAM);
 
-        $groupAdminName    = 'common.permission_group.admin';
+        $groupAdminName = 'common.permission_group.admin';
         $optionsGroupAdmin = &$options[$groupAdminName];
         $this->preparePermissionOption($optionsGroupAdmin, Permission::ACCESS, SrsResource::ADMIN);
         $this->preparePermissionOption($optionsGroupAdmin, Permission::MANAGE, SrsResource::CMS);
@@ -286,9 +284,9 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    private function preparePermissionOption(?array &$optionsGroup, string $permissionName, string $resourceName) : void
+    private function preparePermissionOption(?array &$optionsGroup, string $permissionName, string $resourceName): void
     {
-        $permission                         = $this->permissionRepository->findByPermissionAndResourceName($permissionName, $resourceName);
+        $permission = $this->permissionRepository->findByPermissionAndResourceName($permissionName, $resourceName);
         $optionsGroup[$permission->getId()] = 'common.permission_name.' . $permissionName . '.' . $resourceName;
     }
 
@@ -299,10 +297,10 @@ class EditRoleFormFactory
      *
      * @throws ConnectionException
      */
-    public function validateIncompatibleAndRequiredCollision(MultiSelectBox $field, array $args) : bool
+    public function validateIncompatibleAndRequiredCollision(MultiSelectBox $field, array $args): bool
     {
         $incompatibleRoles = $this->roleRepository->findRolesByIds($args[0]);
-        $requiredRoles     = $this->roleRepository->findRolesByIds($args[1]);
+        $requiredRoles = $this->roleRepository->findRolesByIds($args[1]);
 
         $this->em->getConnection()->beginTransaction();
 
@@ -319,7 +317,7 @@ class EditRoleFormFactory
                 }
             }
 
-            if (! $valid) {
+            if (!$valid) {
                 break;
             }
         }
@@ -334,8 +332,9 @@ class EditRoleFormFactory
      *
      * @param string[][] $args
      */
-    public function validateRedirectAllowed(SelectBox $field, array $args) : bool
+    public function validateRedirectAllowed(SelectBox $field, array $args): bool
     {
         return in_array($field->getValue(), $args[0]);
     }
+
 }
