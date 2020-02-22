@@ -18,6 +18,8 @@ use Nette\Security\AuthenticationException;
 use Nette\Security\Identity;
 use Throwable;
 use Ublaboo\Mailing\Exception\MailingMailCreationException;
+use WebLoader\Nette\CssLoader;
+use WebLoader\Nette\JavaScriptLoader;
 use function strpos;
 
 class AuthPresenter extends BasePresenter
@@ -53,6 +55,22 @@ class AuthPresenter extends BasePresenter
     }
 
     /**
+     * Načte css podle konfigurace v common.neon.
+     */
+    protected function createComponentCss(): CssLoader
+    {
+        return $this->webLoader->createCssLoader('auth');
+    }
+
+    /**
+     * Načte javascript podle konfigurace v common.neon.
+     */
+    protected function createComponentJs(): JavaScriptLoader
+    {
+        return $this->webLoader->createJavaScriptLoader('auth');
+    }
+
+    /**
      * Sign-in form factory.
      */
     protected function createComponentSignInForm(): Form
@@ -61,6 +79,13 @@ class AuthPresenter extends BasePresenter
                     $this->restoreRequest($this->backlink);
                     $this->redirect(':Web:Page:');
                 });
+    }
+
+    public function actionLogout()
+    {
+        $this->user->logout();
+        $this->presenter->flashMessage('Odhlášení proběhlo úspěšně', 'success');
+        $this->redirect('Auth:login');
     }
 
 }

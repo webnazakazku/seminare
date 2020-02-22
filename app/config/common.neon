@@ -294,6 +294,10 @@ webloader:
 			files:
 				- export/style.css
 
+		auth:
+			files:
+				- %appDir%/../vendor/twbs/bootstrap/dist/css/bootstrap.min.css
+				- auth/style.css
 	js:
 		web:
 			files:
@@ -343,6 +347,12 @@ webloader:
 				- %appDir%/../vendor/ublaboo/datagrid/assets/datagrid-instant-url-refresh.js
 				- %appDir%/../vendor/ublaboo/datagrid/assets/datagrid-spinners.js
 				- main.js
+
+		auth:
+			files:
+				- libs/jquery/jquery-3.4.1.min.js
+				- libs/live-form-validation.js
+				- %appDir%/../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js
 
 		install:
 			files:
