@@ -51,7 +51,7 @@ class User
     protected $username;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true, options={"collation":"utf8_bin"})
+     * @ORM\Column(type="string", nullable=true, options={"collation":"utf8_bin"})
      *
      * @var string
      */
