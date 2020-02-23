@@ -5,20 +5,13 @@ php: 7.3
 script:
   - echo ""
 
-before_deploy:
+before_script:
   - composer self-update
-  - composer install --no-dev --prefer-dist --optimize-autoloader
+  - composer require phing/phing:2.*
+  #- composer install --no-dev --prefer-dist --optimize-autoloader
   - mv app/config/sample.local.neon app/config/local.neon
   - rm -f app/config/ci.local.neon
-  - zip -r SRS app backup log migrations temp vendor www .htaccess README.md
+  #- zip -r SRS app backup log migrations temp vendor www .htaccess README.md
 
-deploy:
-  provider: releases
-  api_key:
-    secure: DT6qfSlb6dVuXZKMnPLddyheWDsAargfBD2KfchL3uIy86c7iJBeovXXZxdXQDslDAMfllJqCsTeuX0arfUXLJYwT54aNysBqdrnz9TZcsovcM3E+g8YCWjIrbVMG46wXC2cz8DMrhXhHlg36BzNrEaWIe+ov5gp6EgafWyhK2U=
-  file: SRS.zip
-  skip_cleanup: true
-  on:
-    repo: skaut/SRS
-    branch: master
-    tags: true
+script:
+    - vendor/bin/phing
