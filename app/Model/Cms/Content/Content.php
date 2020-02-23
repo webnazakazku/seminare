@@ -23,7 +23,6 @@ use stdClass;
  *     "document_content" = "DocumentContent",
  *     "application_content" = "ApplicationContent",
  *     "html_content" = "HtmlContent",
- *     "faq_content" = "FaqContent",
  *     "news_content" = "NewsContent",
  *     "place_content" = "PlaceContent",
  *     "programs_content" = "ProgramsContent",
@@ -63,11 +62,6 @@ abstract class Content implements IContent
      * HtmlContent.
      */
     public const HTML = 'html';
-
-    /**
-     * FaqContent.
-     */
-    public const FAQ = 'faq';
 
     /**
      * NewsContent.
@@ -116,7 +110,6 @@ abstract class Content implements IContent
         self::DOCUMENT,
         self::APPLICATION,
         self::HTML,
-        self::FAQ,
         self::NEWS,
         self::PLACE,
         self::PROGRAMS,

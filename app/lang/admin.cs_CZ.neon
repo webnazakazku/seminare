@@ -44,7 +44,6 @@ cms:
     menu_pages: "Stránky"
     menu_news: "Aktuality"
     menu_documents: "Dokumenty"
-    menu_faq: "FAQ"
 
     pages_heading: "Stránky"
     pages_name: "Název"
@@ -131,24 +130,6 @@ cms:
     tags_saved: "Kategorie byla úspěšně uložena."
     tags_delete_confirm: "Odstraněním kategorie odeberete kategorii všem dokumentům. Opravdu chcete kategorii odstranit?"
     tags_deleted: "Kategorie byla úspěšně odstraněna."
-
-    faq_heading: "FAQ"
-    faq_question: "Otázka"
-    faq_question_empty: "Zadejte otázku."
-    faq_author: "Autor"
-    faq_public: "Viditelnost"
-    faq_public_public: "Viditelná"
-    faq_public_private: "Skrytá"
-    faq_public_form: "viditelná"
-    faq_answer: "Odpověď"
-    faq_answered: "Zodpovězena"
-    faq_saved: "Otázka byla úspěšně uložena."
-    faq_delete_confirm: "Opravdu chcete otázku odstranit?"
-    faq_deleted: "Otázka byla úspěšně odstraněna."
-    faq_order_saved: "Pořadí otázek bylo úspěšně upraveno."
-    faq_changed_public: "Viditelnost otázky byla úspěšně změněna."
-    faq_add_heading: "Nová otázka"
-    faq_edit_heading: "Úprava otázky"
 
 program:
     menu_blocks: "Programové bloky"

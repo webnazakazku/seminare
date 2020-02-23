@@ -8,13 +8,11 @@ use App\WebModule\Components\ApplicationContentControl;
 use App\WebModule\Components\BlocksContentControl;
 use App\WebModule\Components\CapacitiesContentControl;
 use App\WebModule\Components\DocumentContentControl;
-use App\WebModule\Components\FaqContentControl;
 use App\WebModule\Components\HtmlContentControl;
 use App\WebModule\Components\IApplicationContentControlFactory;
 use App\WebModule\Components\IBlocksContentControlFactory;
 use App\WebModule\Components\ICapacitiesContentControlFactory;
 use App\WebModule\Components\IDocumentContentControlFactory;
-use App\WebModule\Components\IFaqContentControlFactory;
 use App\WebModule\Components\IHtmlContentControlFactory;
 use App\WebModule\Components\IImageContentControlFactory;
 use App\WebModule\Components\ILectorsContentControlFactory;
@@ -64,12 +62,6 @@ class PagePresenter extends WebBasePresenter
      * @inject
      */
     public $documentContentControlFactory;
-
-    /**
-     * @var IFaqContentControlFactory
-     * @inject
-     */
-    public $faqContentControlFactory;
 
     /**
      * @var IHtmlContentControlFactory
@@ -167,11 +159,6 @@ class PagePresenter extends WebBasePresenter
     protected function createComponentDocumentContent() : DocumentContentControl
     {
         return $this->documentContentControlFactory->create();
-    }
-
-    protected function createComponentFaqContent() : FaqContentControl
-    {
-        return $this->faqContentControlFactory->create();
     }
 
     protected function createComponentHtmlContent() : HtmlContentControl
