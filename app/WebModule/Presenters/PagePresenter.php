@@ -17,13 +17,11 @@ use App\WebModule\Components\IHtmlContentControlFactory;
 use App\WebModule\Components\IImageContentControlFactory;
 use App\WebModule\Components\ILectorsContentControlFactory;
 use App\WebModule\Components\ImageContentControl;
-use App\WebModule\Components\INewsContentControlFactory;
 use App\WebModule\Components\IPlaceContentControlFactory;
 use App\WebModule\Components\IProgramsContentControlFactory;
 use App\WebModule\Components\ITextContentControlFactory;
 use App\WebModule\Components\IUsersContentControlFactory;
 use App\WebModule\Components\LectorsContentControl;
-use App\WebModule\Components\NewsContentControl;
 use App\WebModule\Components\PlaceContentControl;
 use App\WebModule\Components\ProgramsContentControl;
 use App\WebModule\Components\TextContentControl;
@@ -74,12 +72,6 @@ class PagePresenter extends WebBasePresenter
      * @inject
      */
     public $imageContentControlFactory;
-
-    /**
-     * @var INewsContentControlFactory
-     * @inject
-     */
-    public $newsContentControlFactory;
 
     /**
      * @var IPlaceContentControlFactory
@@ -169,11 +161,6 @@ class PagePresenter extends WebBasePresenter
     protected function createComponentImageContent() : ImageContentControl
     {
         return $this->imageContentControlFactory->create();
-    }
-
-    protected function createComponentNewsContent() : NewsContentControl
-    {
-        return $this->newsContentControlFactory->create();
     }
 
     protected function createComponentPlaceContent() : PlaceContentControl
