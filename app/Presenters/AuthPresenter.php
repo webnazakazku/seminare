@@ -5,26 +5,15 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Components\Forms;
-use App\Model\Mailing\Template;
-use App\Model\Mailing\TemplateVariable;
-use App\Model\Settings\Settings;
-use App\Model\Settings\SettingsException;
 use App\Model\User\UserRepository;
 use App\Services\MailService;
 use App\Services\SettingsService;
-use Nette\Application\AbortException;
 use Nette\Application\UI\Form;
-use Nette\Security\AuthenticationException;
-use Nette\Security\Identity;
-use Throwable;
-use Ublaboo\Mailing\Exception\MailingMailCreationException;
 use WebLoader\Nette\CssLoader;
 use WebLoader\Nette\JavaScriptLoader;
-use function strpos;
 
 class AuthPresenter extends BasePresenter
 {
-
     /**
      * @var SettingsService
      * @inject
@@ -43,7 +32,10 @@ class AuthPresenter extends BasePresenter
      */
     public $mailService;
 
-    /** @persistent */
+    /**
+     * @var string
+     * @persistent
+     */
     public $backlink = '';
 
     /** @var Forms\SignInFormFactory */
@@ -57,7 +49,7 @@ class AuthPresenter extends BasePresenter
     /**
      * Načte css podle konfigurace v common.neon.
      */
-    protected function createComponentCss(): CssLoader
+    protected function createComponentCss() : CssLoader
     {
         return $this->webLoader->createCssLoader('auth');
     }
@@ -65,7 +57,7 @@ class AuthPresenter extends BasePresenter
     /**
      * Načte javascript podle konfigurace v common.neon.
      */
-    protected function createComponentJs(): JavaScriptLoader
+    protected function createComponentJs() : JavaScriptLoader
     {
         return $this->webLoader->createJavaScriptLoader('auth');
     }
@@ -73,19 +65,18 @@ class AuthPresenter extends BasePresenter
     /**
      * Sign-in form factory.
      */
-    protected function createComponentSignInForm(): Form
+    protected function createComponentSignInForm() : Form
     {
-        return $this->signInFactory->create(function (): void {
+        return $this->signInFactory->create(function () : void {
                     $this->restoreRequest($this->backlink);
                     $this->redirect(':Web:Page:');
-                });
+        });
     }
 
-    public function actionLogout()
+    public function actionLogout() : void
     {
         $this->user->logout();
         $this->presenter->flashMessage('Odhlášení proběhlo úspěšně', 'success');
         $this->redirect('Auth:login');
     }
-
 }

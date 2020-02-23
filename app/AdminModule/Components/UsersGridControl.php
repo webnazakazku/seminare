@@ -12,7 +12,6 @@ use App\Model\Settings\CustomInput\CustomCheckbox;
 use App\Model\Settings\CustomInput\CustomInputRepository;
 use App\Model\Settings\CustomInput\CustomSelect;
 use App\Model\Settings\CustomInput\CustomText;
-use App\Model\Settings\Settings;
 use App\Model\Settings\SettingsException;
 use App\Model\User\CustomInputValue\CustomCheckboxValue;
 use App\Model\User\CustomInputValue\CustomFileValue;
@@ -24,16 +23,13 @@ use App\Services\AclService;
 use App\Services\ApplicationService;
 use App\Services\ExcelExportService;
 use App\Services\PdfExportService;
-use App\Services\SettingsService;
 use App\Services\SubeventService;
-use App\Services\UserService;
 use App\Utils\Helpers;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
-use InvalidArgumentException;
 use Nette\Application\AbortException;
 use Nette\Application\UI\Control;
 use Nette\Http\Session;
@@ -58,7 +54,6 @@ use function explode;
  */
 class UsersGridControl extends Control
 {
-
     /** @var ITranslator */
     private $translator;
 
@@ -67,9 +62,6 @@ class UsersGridControl extends Control
 
     /** @var UserRepository */
     private $userRepository;
-
-    /** @var SettingsService */
-    private $settingsService;
 
     /** @var CustomInputRepository */
     private $customInputRepository;
@@ -95,49 +87,41 @@ class UsersGridControl extends Control
     /** @var ApplicationService */
     private $applicationService;
 
-    /** @var UserService */
-    private $userService;
-
     /** @var SubeventService */
     private $subeventService;
 
     public function __construct(
-            ITranslator $translator,
-            EntityManagerDecorator $em,
-            UserRepository $userRepository,
-            SettingsService $settingsService,
-            CustomInputRepository $customInputRepository,
-            RoleRepository $roleRepository,
-            PdfExportService $pdfExportService,
-            ExcelExportService $excelExportService,
-            Session $session,
-            AclService $aclService,
-            ApplicationService $applicationService,
-            UserService $userService,
-            SubeventService $subeventService
-    )
-    {
-        $this->translator = $translator;
-        $this->em = $em;
-        $this->userRepository = $userRepository;
-        $this->settingsService = $settingsService;
+        ITranslator $translator,
+        EntityManagerDecorator $em,
+        UserRepository $userRepository,
+        CustomInputRepository $customInputRepository,
+        RoleRepository $roleRepository,
+        PdfExportService $pdfExportService,
+        ExcelExportService $excelExportService,
+        Session $session,
+        AclService $aclService,
+        ApplicationService $applicationService,
+        SubeventService $subeventService
+    ) {
+        $this->translator            = $translator;
+        $this->em                    = $em;
+        $this->userRepository        = $userRepository;
         $this->customInputRepository = $customInputRepository;
-        $this->roleRepository = $roleRepository;
-        $this->pdfExportService = $pdfExportService;
-        $this->excelExportService = $excelExportService;
-        $this->aclService = $aclService;
-        $this->applicationService = $applicationService;
-        $this->userService = $userService;
-        $this->subeventService = $subeventService;
+        $this->roleRepository        = $roleRepository;
+        $this->pdfExportService      = $pdfExportService;
+        $this->excelExportService    = $excelExportService;
+        $this->aclService            = $aclService;
+        $this->applicationService    = $applicationService;
+        $this->subeventService       = $subeventService;
 
-        $this->session = $session;
+        $this->session        = $session;
         $this->sessionSection = $session->getSection('srs');
     }
 
     /**
      * Vykreslí komponentu.
      */
-    public function render(): void
+    public function render() : void
     {
         $this->template->setFile(__DIR__ . '/templates/users_grid.latte');
         $this->template->render();
@@ -151,7 +135,7 @@ class UsersGridControl extends Control
      * @throws DataGridColumnStatusException
      * @throws DataGridException
      */
-    public function createComponentUsersGrid(string $name): void
+    public function createComponentUsersGrid(string $name) : void
     {
         $grid = new DataGrid($this, $name);
         $grid->setTranslator($this->translator);
@@ -165,9 +149,9 @@ class UsersGridControl extends Control
                 ->onSelect[] = [$this, 'groupApprove'];
 
         $grid->addGroupMultiSelectAction(
-                        'admin.users.users_group_action_change_roles',
-                        $this->aclService->getRolesWithoutRolesOptionsWithCapacity([Role::GUEST, Role::UNAPPROVED, Role::NONREGISTERED])
-                )
+            'admin.users.users_group_action_change_roles',
+            $this->aclService->getRolesWithoutRolesOptionsWithCapacity([Role::GUEST, Role::UNAPPROVED, Role::NONREGISTERED])
+        )
                 ->onSelect[] = [$this, 'groupChangeRoles'];
 
         $grid->addGroupAction('admin.users.users_group_action_mark_attended')
@@ -201,7 +185,7 @@ class UsersGridControl extends Control
 
         $grid->addColumnText('roles', 'admin.users.users_roles', 'rolesText')
                 ->setFilterMultiSelect($this->aclService->getRolesWithoutRolesOptions([Role::GUEST, Role::UNAPPROVED]))
-                ->setCondition(static function ($qb, $values): void {
+                ->setCondition(static function ($qb, $values) : void {
                     $qb->join('u.roles', 'uR')
                     ->andWhere('uR.id IN (:rids)')
                     ->setParameter('rids', $values);
@@ -209,7 +193,7 @@ class UsersGridControl extends Control
 
         $grid->addColumnText('subevents', 'admin.users.users_subevents', 'subeventsText')
                 ->setFilterMultiSelect($this->subeventService->getSubeventsOptions())
-                ->setCondition(static function ($qb, $values): void {
+                ->setCondition(static function ($qb, $values) : void {
                     $qb->join('u.applications', 'uA')
                     ->join('uA.subevents', 'uAS')
                     ->andWhere('uAS.id IN (:sids)')
@@ -219,7 +203,7 @@ class UsersGridControl extends Control
                     ->setParameter('states', [ApplicationState::PAID, ApplicationState::PAID_FREE, ApplicationState::WAITING_FOR_PAYMENT]);
                 });
 
-        $columnApproved = $grid->addColumnStatus('approved', 'admin.users.users_approved');
+        $columnApproved      = $grid->addColumnStatus('approved', 'admin.users.users_approved');
         $columnApproved
                         ->addOption(false, 'admin.users.users_approved_unapproved')
                         ->setClass('btn-danger')
@@ -239,7 +223,7 @@ class UsersGridControl extends Control
 
         $grid->addColumnNumber('age', 'admin.users.users_age')
                 ->setSortable()
-                ->setSortableCallback(static function (QueryBuilder $qb, array $sort): void {
+                ->setSortableCallback(static function (QueryBuilder $qb, array $sort) : void {
                     $sortRev = $sort['age'] === 'DESC' ? 'ASC' : 'DESC';
                     $qb->orderBy('u.birthdate', $sortRev);
                 });
@@ -265,7 +249,7 @@ class UsersGridControl extends Control
 
         $grid->addColumnText('variableSymbol', 'admin.users.users_variable_symbol', 'variableSymbolsText')
                 ->setFilterText()
-                ->setCondition(static function (QueryBuilder $qb, $value): void {
+                ->setCondition(static function (QueryBuilder $qb, $value) : void {
                     $qb->join('u.applications', 'uAVS')
                     ->join('uAVS.variableSymbol', 'uAVSVS')
                     ->andWhere('uAVSVS.variableSymbol LIKE :variableSymbol')
@@ -286,7 +270,7 @@ class UsersGridControl extends Control
                 ->setFormat(Helpers::DATETIME_FORMAT)
                 ->setSortable();
 
-        $columnAttended = $grid->addColumnStatus('attended', 'admin.users.users_attended');
+        $columnAttended      = $grid->addColumnStatus('attended', 'admin.users.users_attended');
         $columnAttended
                         ->addOption(false, 'admin.users.users_attended_no')
                         ->setClass('btn-danger')
@@ -318,37 +302,37 @@ class UsersGridControl extends Control
 
             $columnCustomInput = $grid->addColumnText($columnCustomInputName, Helpers::truncate($customInput->getName(), 20))
                     ->setRenderer(function (User $user) use ($customInput) {
-                $customInputValue = $user->getCustomInputValue($customInput);
-                if ($customInputValue) {
-                    switch (true) {
-                        case $customInputValue instanceof CustomTextValue:
-                            return Helpers::truncate($customInputValue->getValue(), 20);
-                        case $customInputValue instanceof CustomCheckboxValue:
-                            return $customInputValue->getValue() ? $this->translator->translate('admin.common.yes') : $this->translator->translate('admin.common.no');
-                        case $customInputValue instanceof CustomSelectValue:
-                            return $customInputValue->getValueOption();
-                        case $customInputValue instanceof CustomFileValue:
-                            return $customInputValue->getValue() ? Html::el('a')
+                        $customInputValue = $user->getCustomInputValue($customInput);
+                        if ($customInputValue) {
+                            switch (true) {
+                                case $customInputValue instanceof CustomTextValue:
+                                    return Helpers::truncate($customInputValue->getValue(), 20);
+                                case $customInputValue instanceof CustomCheckboxValue:
+                                    return $customInputValue->getValue() ? $this->translator->translate('admin.common.yes') : $this->translator->translate('admin.common.no');
+                                case $customInputValue instanceof CustomSelectValue:
+                                    return $customInputValue->getValueOption();
+                                case $customInputValue instanceof CustomFileValue:
+                                    return $customInputValue->getValue() ? Html::el('a')
                                     ->setAttribute('href', $this->getPresenter()->getTemplate()->basePath
                                             . '/files' . $customInputValue->getValue())
-                                    ->setAttribute('title', array_values(array_slice(explode('/', $customInputValue->getValue()), -1))[0])
-                                    ->setAttribute('target', '_blank')
-                                    ->setAttribute('class', 'btn btn-xs btn-secondary')
-                                    ->addHtml(
-                                            Html::el('span')->setAttribute('class', 'fa fa-download')
-                                    ) : '';
-                    }
-                }
+                                            ->setAttribute('title', array_values(array_slice(explode('/', $customInputValue->getValue()), -1))[0])
+                                            ->setAttribute('target', '_blank')
+                                            ->setAttribute('class', 'btn btn-xs btn-secondary')
+                                            ->addHtml(
+                                                Html::el('span')->setAttribute('class', 'fa fa-download')
+                                            ) : '';
+                            }
+                        }
 
-                return null;
-            });
+                        return null;
+                    });
 
             $columnCustomInput->getElementPrototype('th')->setAttribute('title', $customInput->getName());
 
             switch (true) {
                 case $customInput instanceof CustomText:
                     $columnCustomInput->setSortable()
-                            ->setSortableCallback(static function (QueryBuilder $qb, array $sort) use ($customInput, $columnCustomInputName): void {
+                            ->setSortableCallback(static function (QueryBuilder $qb, array $sort) use ($customInput, $columnCustomInputName) : void {
                                 $qb->leftJoin('u.customInputValues', 'uCIV1')
                                 ->leftJoin('uCIV1.input', 'uCIVI1')
                                 ->leftJoin('App\Model\User\CustomInputValue\CustomTextValue', 'uCTV', 'WITH', 'uCIV1.id = uCTV.id')
@@ -360,7 +344,7 @@ class UsersGridControl extends Control
 
                 case $customInput instanceof CustomCheckbox:
                     $columnCustomInput->setFilterSelect(['' => 'admin.common.all', 1 => 'admin.common.yes', 0 => 'admin.common.no'])
-                            ->setCondition(static function (QueryBuilder $qb, string $value) use ($customInput): void {
+                            ->setCondition(static function (QueryBuilder $qb, string $value) use ($customInput) : void {
                                 if ($value === '') {
                                     return;
                                 } else {
@@ -378,7 +362,7 @@ class UsersGridControl extends Control
 
                 case $customInput instanceof CustomSelect:
                     $columnCustomInput->setFilterSelect(array_merge(['' => 'admin.common.all'], $customInput->getSelectOptions()))
-                            ->setCondition(static function (QueryBuilder $qb, string $value) use ($customInput): void {
+                            ->setCondition(static function (QueryBuilder $qb, string $value) use ($customInput) : void {
                                 if ($value === '') {
                                     return;
                                 } else {
@@ -413,7 +397,7 @@ class UsersGridControl extends Control
                 ->addAttributes([
                     'data-toggle' => 'confirmation',
                     'data-content' => $this->translator->translate('admin.users.users_delete_confirm'),
-        ]);
+                ]);
         $grid->allowRowsAction('delete', static function (User $item) {
             return $item->isExternalLector();
         });
@@ -427,7 +411,7 @@ class UsersGridControl extends Control
      * @throws ORMException
      * @throws AbortException
      */
-    public function handleDelete(int $id): void
+    public function handleDelete(int $id) : void
     {
         $user = $this->userRepository->findById($id);
 
@@ -444,7 +428,7 @@ class UsersGridControl extends Control
      * @throws ORMException
      * @throws AbortException
      */
-    public function changeApproved(string $id, string $approved): void
+    public function changeApproved(string $id, string $approved) : void
     {
         $user = $this->userRepository->findById((int) $id);
         $user->setApproved((bool) $approved);
@@ -469,7 +453,7 @@ class UsersGridControl extends Control
      * @throws ORMException
      * @throws AbortException
      */
-    public function changeAttended(string $id, string $attended): void
+    public function changeAttended(string $id, string $attended) : void
     {
         $user = $this->userRepository->findById((int) $id);
         $user->setAttended((bool) $attended);
@@ -496,11 +480,11 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Throwable
      */
-    public function groupApprove(array $ids): void
+    public function groupApprove(array $ids) : void
     {
         $users = $this->userRepository->findUsersByIds($ids);
 
-        $this->em->transactional(function () use ($users): void {
+        $this->em->transactional(function () use ($users) : void {
             foreach ($users as $user) {
                 $user->setApproved(true);
                 $this->userRepository->save($user);
@@ -519,9 +503,9 @@ class UsersGridControl extends Control
      *
      * @throws Throwable
      */
-    public function groupChangeRoles(array $ids, array $value): void
+    public function groupChangeRoles(array $ids, array $value) : void
     {
-        $users = $this->userRepository->findUsersByIds($ids);
+        $users         = $this->userRepository->findUsersByIds($ids);
         $selectedRoles = $this->roleRepository->findRolesByIds($value);
 
         $p = $this->getPresenter();
@@ -534,7 +518,7 @@ class UsersGridControl extends Control
 
         //v rolich musi byt dostatek volnych mist
         $capacitiesOk = $selectedRoles->forAll(static function (int $key, Role $role) use ($users) {
-            if (!$role->hasLimitedCapacity()) {
+            if (! $role->hasLimitedCapacity()) {
                 return true;
             }
 
@@ -553,14 +537,14 @@ class UsersGridControl extends Control
             return $capacityNeeded <= $role->getCapacity();
         });
 
-        if (!$capacitiesOk) {
+        if (! $capacitiesOk) {
             $p->flashMessage('admin.users.users_group_action_change_roles_error_capacity', 'danger');
             $this->redirect('this');
         }
 
         $loggedUser = $this->userRepository->findById($p->getUser()->id);
 
-        $this->em->transactional(function () use ($selectedRoles, $users, $loggedUser): void {
+        $this->em->transactional(function () use ($selectedRoles, $users, $loggedUser) : void {
             foreach ($users as $user) {
                 $this->applicationService->updateRoles($user, $selectedRoles, $loggedUser, true);
             }
@@ -578,11 +562,11 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Throwable
      */
-    public function groupMarkAttended(array $ids): void
+    public function groupMarkAttended(array $ids) : void
     {
         $users = $this->userRepository->findUsersByIds($ids);
 
-        $this->em->transactional(function () use ($users): void {
+        $this->em->transactional(function () use ($users) : void {
             foreach ($users as $user) {
                 $user->setAttended(true);
                 $this->userRepository->save($user);
@@ -601,7 +585,7 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Throwable
      */
-    public function groupMarkPaidToday(array $ids, string $paymentMethod): void
+    public function groupMarkPaidToday(array $ids, string $paymentMethod) : void
     {
         $users = $this->userRepository->findUsersByIds($ids);
 
@@ -609,16 +593,16 @@ class UsersGridControl extends Control
 
         $loggedUser = $this->userRepository->findById($p->getUser()->id);
 
-        $this->em->transactional(function () use ($users, $paymentMethod, $loggedUser): void {
+        $this->em->transactional(function () use ($users, $paymentMethod, $loggedUser) : void {
             foreach ($users as $user) {
                 foreach ($user->getWaitingForPaymentApplications() as $application) {
                     $this->applicationService->updateApplicationPayment(
-                            $application,
-                            $paymentMethod,
-                            new DateTimeImmutable(),
-                            $application->getIncomeProofPrintedDate(),
-                            $application->getMaturityDate(),
-                            $loggedUser
+                        $application,
+                        $paymentMethod,
+                        new DateTimeImmutable(),
+                        $application->getIncomeProofPrintedDate(),
+                        $application->getMaturityDate(),
+                        $loggedUser
                     );
                 }
             }
@@ -635,7 +619,7 @@ class UsersGridControl extends Control
      *
      * @throws AbortException
      */
-    public function groupGeneratePaymentProofs(array $ids): void
+    public function groupGeneratePaymentProofs(array $ids) : void
     {
         $this->sessionSection->userIds = $ids;
         $this->redirect('generatepaymentproofs'); //presmerovani kvuli zruseni ajax
@@ -648,7 +632,7 @@ class UsersGridControl extends Control
      *
      * @throws AbortException
      */
-    public function groupExportUsers(array $ids): void
+    public function groupExportUsers(array $ids) : void
     {
         $this->sessionSection->userIds = $ids;
         $this->redirect('exportusers'); //presmerovani kvuli zruseni ajax
@@ -660,7 +644,7 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Exception
      */
-    public function handleExportUsers(): void
+    public function handleExportUsers() : void
     {
         $ids = $this->session->getSection('srs')->userIds;
 
@@ -678,7 +662,7 @@ class UsersGridControl extends Control
      *
      * @throws AbortException
      */
-    public function groupExportRoles(array $ids): void
+    public function groupExportRoles(array $ids) : void
     {
         $this->sessionSection->userIds = $ids;
         $this->redirect('exportroles'); //presmerovani kvuli zruseni ajax
@@ -690,7 +674,7 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Exception
      */
-    public function handleExportRoles(): void
+    public function handleExportRoles() : void
     {
         $ids = $this->session->getSection('srs')->userIds;
 
@@ -709,7 +693,7 @@ class UsersGridControl extends Control
      *
      * @throws AbortException
      */
-    public function groupExportSubeventsAndCategories(array $ids): void
+    public function groupExportSubeventsAndCategories(array $ids) : void
     {
         $this->sessionSection->userIds = $ids;
         $this->redirect('exportsubeventsandcategories'); //presmerovani kvuli zruseni ajax
@@ -721,7 +705,7 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Exception
      */
-    public function handleExportSubeventsAndCategories(): void
+    public function handleExportSubeventsAndCategories() : void
     {
         $ids = $this->session->getSection('srs')->userIds;
 
@@ -739,7 +723,7 @@ class UsersGridControl extends Control
      *
      * @throws AbortException
      */
-    public function groupExportSchedules(array $ids): void
+    public function groupExportSchedules(array $ids) : void
     {
         $this->sessionSection->userIds = $ids;
         $this->redirect('exportschedules'); //presmerovani kvuli zruseni ajax
@@ -751,7 +735,7 @@ class UsersGridControl extends Control
      * @throws AbortException
      * @throws Exception
      */
-    public function handleExportSchedules(): void
+    public function handleExportSchedules() : void
     {
         $ids = $this->session->getSection('srs')->userIds;
 
@@ -768,14 +752,14 @@ class UsersGridControl extends Control
      * @throws SettingsException
      * @throws Throwable
      */
-    public function handleGeneratePaymentProofs(): void
+    public function handleGeneratePaymentProofs() : void
     {
-        $ids = $this->session->getSection('srs')->userIds;
+        $ids   = $this->session->getSection('srs')->userIds;
         $users = $this->userRepository->findUsersByIds($ids);
         $this->pdfExportService->generateUsersPaymentProofs(
-                $users,
-                'doklady.pdf',
-                $this->userRepository->findById($this->getPresenter()->getUser()->id)
+            $users,
+            'doklady.pdf',
+            $this->userRepository->findById($this->getPresenter()->getUser()->id)
         );
     }
 
@@ -784,7 +768,7 @@ class UsersGridControl extends Control
      *
      * @return string[]
      */
-    private function preparePaymentMethodOptionsWithoutEmpty(): array
+    private function preparePaymentMethodOptionsWithoutEmpty() : array
     {
         $options = [];
         foreach (PaymentType::$types as $type) {
@@ -799,7 +783,7 @@ class UsersGridControl extends Control
      *
      * @return string[]
      */
-    private function preparePaymentMethodOptionsWithMixed(): array
+    private function preparePaymentMethodOptionsWithMixed() : array
     {
         $options = [];
         foreach (PaymentType::$types as $type) {
@@ -810,5 +794,4 @@ class UsersGridControl extends Control
 
         return $options;
     }
-
 }

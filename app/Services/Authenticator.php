@@ -8,17 +8,14 @@ use App\Model\Acl\Role;
 use App\Model\Acl\RoleRepository;
 use App\Model\User\User;
 use App\Model\User\UserRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Nette;
-use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
 use Nette\Security as NS;
 use Nette\Security\IAuthenticator;
 use Nette\Security\Identity;
 use Nette\Security\IIdentity;
-use stdClass;
+use function bdump;
 
 /**
  * Služba starající se o autentizaci uživatelů.
@@ -29,16 +26,10 @@ use stdClass;
  */
 class Authenticator implements IAuthenticator
 {
-
     use Nette\SmartObject;
 
-    /**
-     * @var NS\Passwords
-     */
+    /** @var NS\Passwords */
     private $passwords;
-
-    /** @var Cache */
-    private $userRolesCache;
 
     /** @var UserRepository */
     private $userRepository;
@@ -46,23 +37,14 @@ class Authenticator implements IAuthenticator
     /** @var RoleRepository */
     private $roleRepository;
 
-    /** @var FilesService */
-    private $filesService;
-
     public function __construct(
-            NS\Passwords $passwords,
-            UserRepository $userRepository,
-            RoleRepository $roleRepository,
-            FilesService $filesService,
-            IStorage $storage
-    )
-    {
-        $this->passwords = $passwords;
+        NS\Passwords $passwords,
+        UserRepository $userRepository,
+        RoleRepository $roleRepository
+    ) {
+        $this->passwords      = $passwords;
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
-        $this->filesService = $filesService;
-
-        $this->userRolesCache = new Cache($storage, 'UserRoles');
     }
 
     /**
@@ -73,18 +55,18 @@ class Authenticator implements IAuthenticator
      * @throws ORMException
      * @throws Exception
      */
-    public function authenticate(array $credentials): IIdentity
+    public function authenticate(array $credentials) : IIdentity
     {
-        list($email, $password) = $credentials;
+        [$email, $password] = $credentials;
 
         /**
-         * @var User $user
+         * @var User|null $user
          */
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
-        if (!$user) {
+        if (! $user) {
             throw new Nette\Security\AuthenticationException('The email is incorrect.', self::IDENTITY_NOT_FOUND);
-        } elseif (!$this->passwords->verify($password, $user->getPassword())) {
+        } elseif (! $this->passwords->verify($password, $user->getPassword())) {
             throw new Nette\Security\AuthenticationException('The password is incorrect.', self::INVALID_CREDENTIAL);
         } elseif ($this->passwords->needsRehash($user->getPassword())) {
             //$data = Nette\Utils\ArrayHash::from(["password" => $password]);
@@ -98,35 +80,35 @@ class Authenticator implements IAuthenticator
                 $netteRoles[$role->getId()] = $role->getName();
             }
         } else {
-            $roleUnapproved = $this->roleRepository->findBySystemName(Role::UNAPPROVED);
+            $roleUnapproved                       = $this->roleRepository->findBySystemName(Role::UNAPPROVED);
             $netteRoles[$roleUnapproved->getId()] = $roleUnapproved->getName();
         }
 
         return new Identity($user->getId(), $netteRoles, [
-            'username' => $user->getUsername()
+            'username' => $user->getUsername(),
         ]);
     }
 
     /**
      * Aktualizuje role přihlášeného uživatele.
      */
-    public function updateRoles(NS\User $user, ?Role $testedRole = null): void
+    public function updateRoles(NS\User $user, ?Role $testedRole = null) : void
     {
         $dbuser = $this->userRepository->findById($user->id);
 
         $netteRoles = [];
 
-        if (!$testedRole) {
+        if (! $testedRole) {
             if ($dbuser->isApproved()) {
                 foreach ($dbuser->getRoles() as $role) {
                     $netteRoles[$role->getId()] = $role->getName();
                 }
             } else {
-                $roleUnapproved = $this->roleRepository->findBySystemName(Role::UNAPPROVED);
+                $roleUnapproved                       = $this->roleRepository->findBySystemName(Role::UNAPPROVED);
                 $netteRoles[$roleUnapproved->getId()] = $roleUnapproved->getName();
             }
         } else {
-            $netteRoles[0] = Role::TEST;
+            $netteRoles[0]                    = Role::TEST;
             $netteRoles[$testedRole->getId()] = $testedRole->getName();
         }
 
@@ -134,5 +116,4 @@ class Authenticator implements IAuthenticator
         $identity = $user->identity;
         $identity->setRoles($netteRoles);
     }
-
 }

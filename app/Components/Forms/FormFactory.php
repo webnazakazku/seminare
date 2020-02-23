@@ -9,13 +9,10 @@ use Nette\Application\UI\Form;
 
 final class FormFactory
 {
-
     use Nette\SmartObject;
 
-    public function create(): Form
+    public function create() : Form
     {
-        $form = new Form;
-        return $form;
+        return new Form();
     }
-
 }

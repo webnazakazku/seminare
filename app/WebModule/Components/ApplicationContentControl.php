@@ -29,7 +29,6 @@ use function json_encode;
  */
 class ApplicationContentControl extends Control
 {
-
     /** @var ApplicationFormFactory */
     private $applicationFormFactory;
 
@@ -52,21 +51,20 @@ class ApplicationContentControl extends Control
     public $applicationsGridControlFactory;
 
     public function __construct(
-            ApplicationFormFactory $applicationFormFactory,
-            Authenticator $authenticator,
-            UserRepository $userRepository,
-            RoleRepository $roleRepository,
-            SettingsService $settingsService,
-            SubeventRepository $subeventRepository,
-            IApplicationsGridControlFactory $applicationsGridControlFactory
-    )
-    {
-        $this->applicationFormFactory = $applicationFormFactory;
-        $this->authenticator = $authenticator;
-        $this->userRepository = $userRepository;
-        $this->roleRepository = $roleRepository;
-        $this->settingsService = $settingsService;
-        $this->subeventRepository = $subeventRepository;
+        ApplicationFormFactory $applicationFormFactory,
+        Authenticator $authenticator,
+        UserRepository $userRepository,
+        RoleRepository $roleRepository,
+        SettingsService $settingsService,
+        SubeventRepository $subeventRepository,
+        IApplicationsGridControlFactory $applicationsGridControlFactory
+    ) {
+        $this->applicationFormFactory         = $applicationFormFactory;
+        $this->authenticator                  = $authenticator;
+        $this->userRepository                 = $userRepository;
+        $this->roleRepository                 = $roleRepository;
+        $this->settingsService                = $settingsService;
+        $this->subeventRepository             = $subeventRepository;
         $this->applicationsGridControlFactory = $applicationsGridControlFactory;
     }
 
@@ -75,7 +73,7 @@ class ApplicationContentControl extends Control
      * @throws SettingsException
      * @throws Throwable
      */
-    public function render(?ContentDto $content = null): void
+    public function render(?ContentDto $content = null) : void
     {
         $template = $this->template;
         $template->setFile(__DIR__ . '/templates/application_content.latte');
@@ -86,23 +84,23 @@ class ApplicationContentControl extends Control
 
         $template->backlink = $this->getPresenter()->getHttpRequest()->getUrl()->getPath();
 
-        $user = $this->getPresenter()->user;
+        $user                = $this->getPresenter()->user;
         $template->guestRole = $user->isInRole($this->roleRepository->findBySystemName(Role::GUEST)->getName());
-        $template->testRole = Role::TEST;
+        $template->testRole  = Role::TEST;
 
         $explicitSubeventsExists = $this->subeventRepository->explicitSubeventsExists();
 
         if ($user->isLoggedIn()) {
-            $dbuser = $this->userRepository->findById($user->id);
+            $dbuser              = $this->userRepository->findById($user->id);
             $userHasFixedFeeRole = $dbuser->hasFixedFeeRole();
 
-            $template->unapprovedRole = $user->isInRole($this->roleRepository->findBySystemName(Role::UNAPPROVED)->getName());
-            $template->nonregisteredRole = $user->isInRole($this->roleRepository->findBySystemName(Role::NONREGISTERED)->getName());
-            $template->noRegisterableRole = $this->roleRepository->findAllRegisterableNowOrderedByName()->isEmpty();
-            $template->registrationStart = $this->roleRepository->getRegistrationStart();
-            $template->registrationEnd = $this->roleRepository->getRegistrationEnd();
-            $template->bankAccount = $this->settingsService->getValue(Settings::ACCOUNT_NUMBER);
-            $template->dbuser = $dbuser;
+            $template->unapprovedRole      = $user->isInRole($this->roleRepository->findBySystemName(Role::UNAPPROVED)->getName());
+            $template->nonregisteredRole   = $user->isInRole($this->roleRepository->findBySystemName(Role::NONREGISTERED)->getName());
+            $template->noRegisterableRole  = $this->roleRepository->findFilteredRoles(true, false, false, false)->isEmpty();
+            $template->registrationStart   = $this->roleRepository->getRegistrationStart();
+            $template->registrationEnd     = $this->roleRepository->getRegistrationEnd();
+            $template->bankAccount         = $this->settingsService->getValue(Settings::ACCOUNT_NUMBER);
+            $template->dbuser              = $dbuser;
             $template->userHasFixedFeeRole = $userHasFixedFeeRole;
 
             $template->usersApplications = $explicitSubeventsExists && $userHasFixedFeeRole ? $dbuser->getNotCanceledApplications() : ($explicitSubeventsExists ? $dbuser->getNotCanceledSubeventsApplications() : $dbuser->getNotCanceledRolesApplications()
@@ -110,7 +108,7 @@ class ApplicationContentControl extends Control
         }
 
         $template->explicitSubeventsExists = $explicitSubeventsExists;
-        $template->rolesWithSubevents = json_encode($this->roleRepository->findRolesIds($this->roleRepository->findAllWithSubevents()));
+        $template->rolesWithSubevents      = json_encode($this->roleRepository->findRolesIds($this->roleRepository->findFilteredRoles(false, true, false, false)));
 
         $template->render();
     }
@@ -120,11 +118,11 @@ class ApplicationContentControl extends Control
      * @throws NonUniqueResultException
      * @throws Throwable
      */
-    protected function createComponentApplicationForm(): Form
+    protected function createComponentApplicationForm() : Form
     {
         $form = $this->applicationFormFactory->create($this->getPresenter()->user->id);
 
-        $form->onSuccess[] = function (Form $form, stdClass $values): void {
+        $form->onSuccess[] = function (Form $form, stdClass $values) : void {
             $this->getPresenter()->flashMessage('web.application_content.register_successful', 'success');
 
             $this->authenticator->updateRoles($this->getPresenter()->user);
@@ -135,9 +133,8 @@ class ApplicationContentControl extends Control
         return $form;
     }
 
-    protected function createComponentApplicationsGrid(): ApplicationsGridControl
+    protected function createComponentApplicationsGrid() : ApplicationsGridControl
     {
         return $this->applicationsGridControlFactory->create();
     }
-
 }

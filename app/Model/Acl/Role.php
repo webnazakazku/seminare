@@ -27,7 +27,6 @@ use function spl_object_id;
  */
 class Role
 {
-
     /**
      * Role nepřihlášeného uživatele.
      */
@@ -84,7 +83,6 @@ class Role
         self::ORGANIZER,
         self::ADMIN,
     ];
-
     use Id;
 
     /**
@@ -278,33 +276,33 @@ class Role
 
     public function __construct(string $name)
     {
-        $this->name = $name;
-        $this->users = new ArrayCollection();
-        $this->permissions = new ArrayCollection();
-        $this->pages = new ArrayCollection();
-        $this->incompatibleRoles = new ArrayCollection();
-        $this->requiredByRole = new ArrayCollection();
-        $this->requiredRoles = new ArrayCollection();
+        $this->name                   = $name;
+        $this->users                  = new ArrayCollection();
+        $this->permissions            = new ArrayCollection();
+        $this->pages                  = new ArrayCollection();
+        $this->incompatibleRoles      = new ArrayCollection();
+        $this->requiredByRole         = new ArrayCollection();
+        $this->requiredRoles          = new ArrayCollection();
         $this->registerableCategories = new ArrayCollection();
-        $this->tags = new ArrayCollection();
+        $this->tags                   = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId() : int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name) : void
     {
         $this->name = $name;
     }
 
-    public function getSystemName(): ?string
+    public function getSystemName() : ?string
     {
         return $this->systemName;
     }
@@ -312,7 +310,7 @@ class Role
     /**
      * @return Collection|User[]
      */
-    public function getUsers(): Collection
+    public function getUsers() : Collection
     {
         return $this->users;
     }
@@ -320,7 +318,7 @@ class Role
     /**
      * @return Collection|Permission[]
      */
-    public function getPermissions(): Collection
+    public function getPermissions() : Collection
     {
         return $this->permissions;
     }
@@ -328,7 +326,7 @@ class Role
     /**
      * @param Collection|Permission[] $permissions
      */
-    public function setPermissions(Collection $permissions): void
+    public function setPermissions(Collection $permissions) : void
     {
         $this->permissions->clear();
         foreach ($permissions as $permission) {
@@ -336,7 +334,7 @@ class Role
         }
     }
 
-    public function addPermission(Permission $permission): void
+    public function addPermission(Permission $permission) : void
     {
         $this->permissions->add($permission);
     }
@@ -344,7 +342,7 @@ class Role
     /**
      * @return Collection|Page[]
      */
-    public function getPages(): Collection
+    public function getPages() : Collection
     {
         return $this->pages;
     }
@@ -352,16 +350,16 @@ class Role
     /**
      * @param Collection|Page[] $pages
      */
-    public function setPages(Collection $pages): void
+    public function setPages(Collection $pages) : void
     {
         foreach ($this->getPages() as $page) {
-            if (!$pages->contains($page)) {
+            if (! $pages->contains($page)) {
                 $page->getRoles()->removeElement($this);
             }
         }
 
         foreach ($pages as $page) {
-            if (!$page->getRoles()->contains($this)) {
+            if (! $page->getRoles()->contains($this)) {
                 $page->getRoles()->add($this);
             }
         }
@@ -369,29 +367,29 @@ class Role
         $this->pages = $pages;
     }
 
-    public function addPage(Page $page): void
+    public function addPage(Page $page) : void
     {
-        if (!$this->pages->contains($page)) {
+        if (! $this->pages->contains($page)) {
             $page->addRole($this);
         }
     }
 
-    public function isSystem(): bool
+    public function isSystem() : bool
     {
         return $this->system;
     }
 
-    public function setSystem(bool $system): void
+    public function setSystem(bool $system) : void
     {
         $this->system = $system;
     }
 
-    public function isRegisterable(): bool
+    public function isRegisterable() : bool
     {
         return $this->registerable;
     }
 
-    public function setRegisterable(bool $registerable): void
+    public function setRegisterable(bool $registerable) : void
     {
         $this->registerable = $registerable;
     }
@@ -399,7 +397,7 @@ class Role
     /**
      * Vrací true, pokud je role v tuto chvíli registrovatelná.
      */
-    public function isRegisterableNow(): bool
+    public function isRegisterableNow() : bool
     {
         $now = new DateTimeImmutable();
 
@@ -408,72 +406,72 @@ class Role
                 ($this->registerableTo === null || $this->registerableTo >= $now);
     }
 
-    public function isApprovedAfterRegistration(): bool
+    public function isApprovedAfterRegistration() : bool
     {
         return $this->approvedAfterRegistration;
     }
 
-    public function setApprovedAfterRegistration(bool $approvedAfterRegistration): void
+    public function setApprovedAfterRegistration(bool $approvedAfterRegistration) : void
     {
         $this->approvedAfterRegistration = $approvedAfterRegistration;
     }
 
-    public function getRegisterableFrom(): ?DateTimeImmutable
+    public function getRegisterableFrom() : ?DateTimeImmutable
     {
         return $this->registerableFrom;
     }
 
-    public function setRegisterableFrom(?DateTimeImmutable $registerableFrom): void
+    public function setRegisterableFrom(?DateTimeImmutable $registerableFrom) : void
     {
         $this->registerableFrom = $registerableFrom;
     }
 
-    public function getRegisterableTo(): ?DateTimeImmutable
+    public function getRegisterableTo() : ?DateTimeImmutable
     {
         return $this->registerableTo;
     }
 
-    public function setRegisterableTo(?DateTimeImmutable $registerableTo): void
+    public function setRegisterableTo(?DateTimeImmutable $registerableTo) : void
     {
         $this->registerableTo = $registerableTo;
     }
 
-    public function getCapacity(): ?int
+    public function getCapacity() : ?int
     {
         return $this->capacity;
     }
 
-    public function setCapacity(?int $capacity): void
+    public function setCapacity(?int $capacity) : void
     {
         $this->capacity = $capacity;
     }
 
-    public function hasLimitedCapacity(): bool
+    public function hasLimitedCapacity() : bool
     {
         return $this->capacity !== null;
     }
 
-    public function getOccupancy(): int
+    public function getOccupancy() : int
     {
         return $this->occupancy;
     }
 
-    public function getFee(): ?int
+    public function getFee() : ?int
     {
         return $this->fee;
     }
 
-    public function setFee(?int $fee): void
+    public function setFee(?int $fee) : void
     {
         $this->fee = $fee;
     }
 
-    public function isDisplayArrivalDeparture(): bool
+    public function isDisplayArrivalDeparture() : bool
     {
         return $this->displayArrivalDeparture;
     }
 
-    public function setDisplayArrivalDeparture(bool $displayArrivalDeparture): void
+    public function setDisplayArrivalDeparture(bool $displayArrivalDeparture) : void
     {
         $this->displayArrivalDeparture = $displayArrivalDeparture;
     }
@@ -481,7 +479,7 @@ class Role
     /**
      * @return Collection|Role[]
      */
-    public function getIncompatibleRoles(): Collection
+    public function getIncompatibleRoles() : Collection
     {
         return $this->incompatibleRoles;
     }
@@ -489,16 +487,16 @@ class Role
     /**
      * @param Collection|Role[] $incompatibleRoles
      */
-    public function setIncompatibleRoles(Collection $incompatibleRoles): void
+    public function setIncompatibleRoles(Collection $incompatibleRoles) : void
     {
         foreach ($this->getIncompatibleRoles() as $role) {
-            if (!$incompatibleRoles->contains($role)) {
+            if (! $incompatibleRoles->contains($role)) {
                 $role->getIncompatibleRoles()->removeElement($this);
             }
         }
 
         foreach ($incompatibleRoles as $role) {
-            if (!$role->getIncompatibleRoles()->contains($this)) {
+            if (! $role->getIncompatibleRoles()->contains($this)) {
                 $role->getIncompatibleRoles()->add($this);
             }
         }
@@ -509,7 +507,7 @@ class Role
     /**
      * Vrací názvy všech nekompatibilních rolí.
      */
-    public function getIncompatibleRolesText(): string
+    public function getIncompatibleRolesText() : string
     {
         $incompatibleRolesNames = [];
         foreach ($this->getIncompatibleRoles() as $incompatibleRole) {
@@ -519,9 +517,9 @@ class Role
         return implode(', ', $incompatibleRolesNames);
     }
 
-    public function addIncompatibleRole(Role $role): void
+    public function addIncompatibleRole(Role $role) : void
     {
-        if (!$this->incompatibleRoles->contains($role)) {
+        if (! $this->incompatibleRoles->contains($role)) {
             $this->incompatibleRoles->add($role);
         }
     }
@@ -529,7 +527,7 @@ class Role
     /**
      * @return Collection|Role[]
      */
-    public function getRequiredByRole(): Collection
+    public function getRequiredByRole() : Collection
     {
         return $this->requiredByRole;
     }
@@ -539,7 +537,7 @@ class Role
      *
      * @return Collection|Role[]
      */
-    public function getRequiredByRoleTransitive(): Collection
+    public function getRequiredByRoleTransitive() : Collection
     {
         $allRequiredByRole = new ArrayCollection();
         foreach ($this->requiredByRole as $requiredByRole) {
@@ -552,9 +550,9 @@ class Role
     /**
      * @param Collection|Role[] $allRequiredByRole
      */
-    private function getRequiredByRoleTransitiveRec(Collection &$allRequiredByRole, Role $role): void
+    private function getRequiredByRoleTransitiveRec(Collection &$allRequiredByRole, Role $role) : void
     {
-        if (spl_object_id($this) !== spl_object_id($role) && !$allRequiredByRole->contains($role)) {
+        if (spl_object_id($this) !== spl_object_id($role) && ! $allRequiredByRole->contains($role)) {
             $allRequiredByRole->add($role);
 
             foreach ($role->requiredByRole as $requiredByRole) {
@@ -566,7 +564,7 @@ class Role
     /**
      * @return Collection|Role[]
      */
-    public function getRequiredRoles(): Collection
+    public function getRequiredRoles() : Collection
     {
         return $this->requiredRoles;
     }
@@ -574,7 +572,7 @@ class Role
     /**
      * @param Collection|Role[] $requiredRoles
      */
-    public function setRequiredRoles(Collection $requiredRoles): void
+    public function setRequiredRoles(Collection $requiredRoles) : void
     {
         $this->requiredRoles->clear();
         foreach ($requiredRoles as $requiredRole) {
@@ -582,9 +580,9 @@ class Role
         }
     }
 
-    public function addRequiredRole(Role $role): void
+    public function addRequiredRole(Role $role) : void
     {
-        if (!$this->requiredRoles->contains($role)) {
+        if (! $this->requiredRoles->contains($role)) {
             $this->requiredRoles->add($role);
         }
     }
@@ -594,7 +592,7 @@ class Role
      *
      * @return Collection|Role[]
      */
-    public function getRequiredRolesTransitive(): Collection
+    public function getRequiredRolesTransitive() : Collection
     {
         $allRequiredRoles = new ArrayCollection();
         foreach ($this->requiredRoles as $requiredRole) {
@@ -607,9 +605,9 @@ class Role
     /**
      * @param Collection|Role[] $allRequiredRoles
      */
-    private function getRequiredRolesTransitiveRec(Collection &$allRequiredRoles, Role $role): void
+    private function getRequiredRolesTransitiveRec(Collection &$allRequiredRoles, Role $role) : void
     {
-        if (spl_object_id($this) !== spl_object_id($role) && !$allRequiredRoles->contains($role)) {
+        if (spl_object_id($this) !== spl_object_id($role) && ! $allRequiredRoles->contains($role)) {
             $allRequiredRoles->add($role);
 
             foreach ($role->requiredRoles as $requiredRole) {
@@ -621,7 +619,7 @@ class Role
     /**
      * Vrací názvy všech vyžadovaných rolí.
      */
-    public function getRequiredRolesTransitiveText(): string
+    public function getRequiredRolesTransitiveText() : string
     {
         $requiredRolesNames = [];
         foreach ($this->getRequiredRolesTransitive() as $requiredRole) {
@@ -634,24 +632,24 @@ class Role
     /**
      * @return Collection|Category[]
      */
-    public function getRegisterableCategories(): Collection
+    public function getRegisterableCategories() : Collection
     {
         return $this->registerableCategories;
     }
 
-    public function addRegisterableCategory(Category $category): void
+    public function addRegisterableCategory(Category $category) : void
     {
-        if (!$this->registerableCategories->contains($category)) {
+        if (! $this->registerableCategories->contains($category)) {
             $category->addRole($this);
         }
     }
 
-    public function getRedirectAfterLogin(): ?string
+    public function getRedirectAfterLogin() : ?string
     {
         return $this->redirectAfterLogin;
     }
 
-    public function setRedirectAfterLogin(?string $redirectAfterLogin): void
+    public function setRedirectAfterLogin(?string $redirectAfterLogin) : void
     {
         $this->redirectAfterLogin = $redirectAfterLogin;
     }
@@ -659,24 +657,23 @@ class Role
     /**
      * @return Collection|Tag[]
      */
-    public function getTags(): Collection
+    public function getTags() : Collection
     {
         return $this->tags;
     }
 
-    public function countUsers(): int
+    public function countUsers() : int
     {
         return $this->users->count();
     }
 
-    public function countUnoccupied(): ?int
+    public function countUnoccupied() : ?int
     {
         return $this->capacity ? $this->capacity - $this->countUsers() : null;
     }
 
-    public function getOccupancyText(): string
+    public function getOccupancyText() : string
     {
         return $this->capacity ? $this->countUsers() . '/' . $this->capacity : '' . $this->countUsers();
     }
-
 }

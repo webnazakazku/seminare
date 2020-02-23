@@ -8,6 +8,7 @@ use App\Model\Acl\Permission;
 use App\Model\Acl\Role;
 use App\Model\Enums\ApplicationState;
 use App\Model\Program\Block;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -24,11 +25,10 @@ use function array_map;
  */
 class UserRepository extends EntityRepository
 {
-
     /**
      * Vrací uživatele podle id.
      */
-    public function findById(?int $id): ?User
+    public function findById(?int $id) : ?User
     {
         return $this->findOneBy(['id' => $id]);
     }
@@ -40,7 +40,7 @@ class UserRepository extends EntityRepository
      *
      * @return Collection|User[]
      */
-    public function findUsersByIds(array $ids): Collection
+    public function findUsersByIds(array $ids) : Collection
     {
         $criteria = Criteria::create()
                 ->where(Criteria::expr()->in('id', $ids));
@@ -55,7 +55,7 @@ class UserRepository extends EntityRepository
      *
      * @return int[]
      */
-    public function findUsersIds(Collection $users): array
+    public function findUsersIds(Collection $users) : array
     {
         return array_map(static function (User $user) {
             return $user->getId();
@@ -67,7 +67,7 @@ class UserRepository extends EntityRepository
      *
      * @return string[]
      */
-    public function findNamesByLikeDisplayNameOrderedByDisplayName(string $text): array
+    public function findNamesByLikeDisplayNameOrderedByDisplayName(string $text) : array
     {
         return $this->createQueryBuilder('u')
                         ->select('u.id, u.displayName')
@@ -82,7 +82,7 @@ class UserRepository extends EntityRepository
      *
      * @return User[]
      */
-    public function findAllInRole(Role $role): array
+    public function findAllInRole(Role $role) : array
     {
         return $this->createQueryBuilder('u')
                         ->join('u.roles', 'r')
@@ -96,7 +96,7 @@ class UserRepository extends EntityRepository
      *
      * @return User[]
      */
-    public function findAllApprovedInRole(Role $role): array
+    public function findAllApprovedInRole(Role $role) : array
     {
         return $this->createQueryBuilder('u')
                         ->join('u.roles', 'r')
@@ -113,7 +113,7 @@ class UserRepository extends EntityRepository
      *
      * @return User[]
      */
-    public function findAllInRoles(array $rolesIds): array
+    public function findAllInRoles(array $rolesIds) : array
     {
         return $this->createQueryBuilder('u')
                         ->join('u.roles', 'r')
@@ -130,7 +130,7 @@ class UserRepository extends EntityRepository
      *
      * @return User[]
      */
-    public function findAllApprovedInRoles(array $rolesIds): array
+    public function findAllApprovedInRoles(array $rolesIds) : array
     {
         return $this->createQueryBuilder('u')
                         ->join('u.roles', 'r')
@@ -148,7 +148,7 @@ class UserRepository extends EntityRepository
      *
      * @return Collection|User[]
      */
-    public function findAllWithSubevents(array $subeventsIds): Collection
+    public function findAllWithSubevents(array $subeventsIds) : Collection
     {
         $result = $this->createQueryBuilder('u')
                 ->join('u.applications', 'a')
@@ -169,7 +169,7 @@ class UserRepository extends EntityRepository
      *
      * @return Collection|User[]
      */
-    public function findAllWithWaitingForPaymentApplication(): Collection
+    public function findAllWithWaitingForPaymentApplication() : Collection
     {
         $result = $this->createQueryBuilder('u')
                 ->join('u.applications', 'a')
@@ -187,7 +187,7 @@ class UserRepository extends EntityRepository
      *
      * @return Collection|User[]
      */
-    public function findBlockAllowed(Block $block): Collection
+    public function findBlockAllowed(Block $block) : Collection
     {
         $qb = $this->createQueryBuilder('u')
                 ->innerJoin('u.roles', 'r')
@@ -216,7 +216,7 @@ class UserRepository extends EntityRepository
      *
      * @return string[]
      */
-    public function getUsersOptions(): array
+    public function getUsersOptions() : array
     {
         $users = $this->createQueryBuilder('u')
                 ->select('u.id, u.displayName')
@@ -237,7 +237,7 @@ class UserRepository extends EntityRepository
      *
      * @return string[]
      */
-    public function getLectorsOptions(): array
+    public function getLectorsOptions() : array
     {
         $lectors = $this->createQueryBuilder('u')
                 ->select('u.id, u.displayName')
@@ -257,11 +257,34 @@ class UserRepository extends EntityRepository
     }
 
     /**
+     * Má lektor jiný program ve stejný čas?
+     */
+    public function hasOverlappingLecturersProgram(User $lector, ?int $programId, DateTimeImmutable $start, DateTimeImmutable $end) : bool
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id')
+            ->join('u.lecturersBlocks', 'b')
+            ->join('b.programs', 'p')
+            ->where($this->createQueryBuilder('u')->expr()->orX(
+                "(p.start < :end) AND (DATE_ADD(p.start, (b.duration * 60), 'second') > :start)",
+                "(p.start < :end) AND (:start < (DATE_ADD(p.start, (b.duration * 60), 'second')))"
+            ))
+            ->andWhere('u.id = :uid')
+            ->andWhere('(p.id != :pid) or (:pid IS NULL)')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('uid', $lector->getId())
+            ->setParameter('pid', $programId);
+
+        return ! empty($qb->getQuery()->getResult());
+    }
+
+    /**
      * Uloží uživatele.
      *
      * @throws ORMException
      */
-    public function save(User $user): void
+    public function save(User $user) : void
     {
         $this->_em->persist($user);
         $this->_em->flush();
@@ -272,7 +295,7 @@ class UserRepository extends EntityRepository
      *
      * @throws ORMException
      */
-    public function remove(User $user): void
+    public function remove(User $user) : void
     {
         foreach ($user->getCustomInputValues() as $customInputValue) {
             $this->_em->remove($customInputValue);
@@ -285,5 +308,4 @@ class UserRepository extends EntityRepository
         $this->_em->remove($user);
         $this->_em->flush();
     }
-
 }

@@ -34,7 +34,6 @@ use function in_array;
  */
 class EditRoleFormFactory
 {
-
     use Nette\SmartObject;
 
     /**
@@ -66,22 +65,21 @@ class EditRoleFormFactory
     private $programService;
 
     public function __construct(
-            BaseFormFactory $baseFormFactory,
-            EntityManagerDecorator $em,
-            AclService $aclService,
-            RoleRepository $roleRepository,
-            PageRepository $pageRepository,
-            PermissionRepository $permissionRepository,
-            ProgramService $programService
-    )
-    {
-        $this->baseFormFactory = $baseFormFactory;
-        $this->em = $em;
-        $this->aclService = $aclService;
-        $this->roleRepository = $roleRepository;
-        $this->pageRepository = $pageRepository;
+        BaseFormFactory $baseFormFactory,
+        EntityManagerDecorator $em,
+        AclService $aclService,
+        RoleRepository $roleRepository,
+        PageRepository $pageRepository,
+        PermissionRepository $permissionRepository,
+        ProgramService $programService
+    ) {
+        $this->baseFormFactory      = $baseFormFactory;
+        $this->em                   = $em;
+        $this->aclService           = $aclService;
+        $this->roleRepository       = $roleRepository;
+        $this->pageRepository       = $pageRepository;
         $this->permissionRepository = $permissionRepository;
-        $this->programService = $programService;
+        $this->programService       = $programService;
     }
 
     /**
@@ -90,7 +88,7 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function create(int $id): Form
+    public function create(int $id) : Form
     {
         $this->role = $this->roleRepository->findById($id);
 
@@ -158,18 +156,18 @@ class EditRoleFormFactory
         $incompatibleRolesSelect
                 ->addCondition(Form::FILLED)
                 ->addRule(
-                        [$this, 'validateIncompatibleAndRequiredCollision'],
-                        'admin.acl.roles_incompatible_collision',
-                        [$incompatibleRolesSelect, $requiredRolesSelect]
-        );
+                    [$this, 'validateIncompatibleAndRequiredCollision'],
+                    'admin.acl.roles_incompatible_collision',
+                    [$incompatibleRolesSelect, $requiredRolesSelect]
+                );
 
         $requiredRolesSelect
                 ->addCondition(Form::FILLED)
                 ->addRule(
-                        [$this, 'validateIncompatibleAndRequiredCollision'],
-                        'admin.acl.roles_required_collision',
-                        [$incompatibleRolesSelect, $requiredRolesSelect]
-        );
+                    [$this, 'validateIncompatibleAndRequiredCollision'],
+                    'admin.acl.roles_required_collision',
+                    [$incompatibleRolesSelect, $requiredRolesSelect]
+                );
 
         $form->addSubmit('submit', 'admin.common.save');
 
@@ -207,13 +205,13 @@ class EditRoleFormFactory
      *
      * @throws Throwable
      */
-    public function processForm(Form $form, stdClass $values): void
+    public function processForm(Form $form, stdClass $values) : void
     {
         if ($form->isSubmitted() === $form['cancel']) {
             return;
         }
 
-        $this->em->transactional(function () use ($values): void {
+        $this->em->transactional(function () use ($values) : void {
             $capacity = $values->capacity !== '' ? $values->capacity : null;
 
             $this->role->setName($values->name);
@@ -249,15 +247,15 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    private function preparePermissionsOptions(): array
+    private function preparePermissionsOptions() : array
     {
         $options = [];
 
-        $groupWebName = 'common.permission_group.web';
+        $groupWebName    = 'common.permission_group.web';
         $optionsGroupWeb = &$options[$groupWebName];
         $this->preparePermissionOption($optionsGroupWeb, Permission::CHOOSE_PROGRAMS, SrsResource::PROGRAM);
 
-        $groupAdminName = 'common.permission_group.admin';
+        $groupAdminName    = 'common.permission_group.admin';
         $optionsGroupAdmin = &$options[$groupAdminName];
         $this->preparePermissionOption($optionsGroupAdmin, Permission::ACCESS, SrsResource::ADMIN);
         $this->preparePermissionOption($optionsGroupAdmin, Permission::MANAGE, SrsResource::CMS);
@@ -284,9 +282,9 @@ class EditRoleFormFactory
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    private function preparePermissionOption(?array &$optionsGroup, string $permissionName, string $resourceName): void
+    private function preparePermissionOption(?array &$optionsGroup, string $permissionName, string $resourceName) : void
     {
-        $permission = $this->permissionRepository->findByPermissionAndResourceName($permissionName, $resourceName);
+        $permission                         = $this->permissionRepository->findByPermissionAndResourceName($permissionName, $resourceName);
         $optionsGroup[$permission->getId()] = 'common.permission_name.' . $permissionName . '.' . $resourceName;
     }
 
@@ -297,10 +295,10 @@ class EditRoleFormFactory
      *
      * @throws ConnectionException
      */
-    public function validateIncompatibleAndRequiredCollision(MultiSelectBox $field, array $args): bool
+    public function validateIncompatibleAndRequiredCollision(MultiSelectBox $field, array $args) : bool
     {
         $incompatibleRoles = $this->roleRepository->findRolesByIds($args[0]);
-        $requiredRoles = $this->roleRepository->findRolesByIds($args[1]);
+        $requiredRoles     = $this->roleRepository->findRolesByIds($args[1]);
 
         $this->em->getConnection()->beginTransaction();
 
@@ -317,7 +315,7 @@ class EditRoleFormFactory
                 }
             }
 
-            if (!$valid) {
+            if (! $valid) {
                 break;
             }
         }
@@ -332,9 +330,8 @@ class EditRoleFormFactory
      *
      * @param string[][] $args
      */
-    public function validateRedirectAllowed(SelectBox $field, array $args): bool
+    public function validateRedirectAllowed(SelectBox $field, array $args) : bool
     {
         return in_array($field->getValue(), $args[0]);
     }
-
 }

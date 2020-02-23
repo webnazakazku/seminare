@@ -22,7 +22,6 @@ use Throwable;
  */
 class AddRoleFormFactory
 {
-
     use Nette\SmartObject;
 
     /** @var BaseFormFactory */
@@ -37,8 +36,8 @@ class AddRoleFormFactory
     public function __construct(BaseFormFactory $baseFormFactory, AclService $aclService, RoleRepository $roleRepository)
     {
         $this->baseFormFactory = $baseFormFactory;
-        $this->aclService = $aclService;
-        $this->roleRepository = $roleRepository;
+        $this->aclService      = $aclService;
+        $this->roleRepository  = $roleRepository;
     }
 
     /**
@@ -46,7 +45,7 @@ class AddRoleFormFactory
      *
      * @throws Throwable
      */
-    public function create(): Form
+    public function create() : Form
     {
         $form = $this->baseFormFactory->create();
 
@@ -76,7 +75,7 @@ class AddRoleFormFactory
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function processForm(Form $form, stdClass $values): void
+    public function processForm(Form $form, stdClass $values) : void
     {
         if ($form->isSubmitted() === $form['cancel']) {
             return;
@@ -125,5 +124,4 @@ class AddRoleFormFactory
 
         $this->aclService->saveRole($role);
     }
-
 }

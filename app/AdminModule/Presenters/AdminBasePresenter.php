@@ -18,8 +18,6 @@ use Nette\Application\AbortException;
 use Throwable;
 use WebLoader\Nette\CssLoader;
 use WebLoader\Nette\JavaScriptLoader;
-use function array_filter;
-use function array_keys;
 
 /**
  * BasePresenter pro AdminModule.
@@ -28,7 +26,6 @@ use function array_keys;
  */
 abstract class AdminBasePresenter extends BasePresenter
 {
-
     /** @var string */
     protected $resource = SrsResource::ADMIN;
 
@@ -66,7 +63,7 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * Načte css podle konfigurace v common.neon.
      */
-    protected function createComponentCss(): CssLoader
+    protected function createComponentCss() : CssLoader
     {
         return $this->webLoader->createCssLoader('admin');
     }
@@ -74,7 +71,7 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * Načte javascript podle konfigurace v common.neon.
      */
-    protected function createComponentJs(): JavaScriptLoader
+    protected function createComponentJs() : JavaScriptLoader
     {
         return $this->webLoader->createJavaScriptLoader('admin');
     }
@@ -82,17 +79,17 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * @throws AbortException
      */
-    public function startup(): void
+    public function startup() : void
     {
         parent::startup();
 
         $this->user->setAuthorizator($this->authorizator);
 
-        if (!$this->user->isLoggedIn()) {
+        if (! $this->user->isLoggedIn()) {
             $this->redirect(':Auth:login', ['backlink' => $this->getHttpRequest()->getUrl()->getPath()]);
         }
 
-        if (!$this->user->isAllowed(SrsResource::ADMIN, Permission::ACCESS)) {
+        if (! $this->user->isAllowed(SrsResource::ADMIN, Permission::ACCESS)) {
             $this->flashMessage('admin.common.access_denied', 'danger', 'lock');
             $this->redirect(':Web:Page:default');
         }
@@ -104,30 +101,30 @@ abstract class AdminBasePresenter extends BasePresenter
      * @throws SettingsException
      * @throws Throwable
      */
-    public function beforeRender(): void
+    public function beforeRender() : void
     {
         parent::beforeRender();
 
         $this->template->dbuser = $this->dbuser;
 
-        $this->template->resourceAcl = SrsResource::ACL;
-        $this->template->resourceCms = SrsResource::CMS;
+        $this->template->resourceAcl           = SrsResource::ACL;
+        $this->template->resourceCms           = SrsResource::CMS;
         $this->template->resourceConfiguration = SrsResource::CONFIGURATION;
-        $this->template->resourceUsers = SrsResource::USERS;
-        $this->template->resourcePayments = SrsResource::PAYMENTS;
-        $this->template->resourceMailing = SrsResource::MAILING;
-        $this->template->resourceProgram = SrsResource::PROGRAM;
+        $this->template->resourceUsers         = SrsResource::USERS;
+        $this->template->resourcePayments      = SrsResource::PAYMENTS;
+        $this->template->resourceMailing       = SrsResource::MAILING;
+        $this->template->resourceProgram       = SrsResource::PROGRAM;
 
-        $this->template->permissionAccess = Permission::ACCESS;
-        $this->template->permissionManage = Permission::MANAGE;
+        $this->template->permissionAccess            = Permission::ACCESS;
+        $this->template->permissionManage            = Permission::MANAGE;
         $this->template->permissionManageOwnPrograms = Permission::MANAGE_OWN_PROGRAMS;
         $this->template->permissionManageAllPrograms = Permission::MANAGE_ALL_PROGRAMS;
-        $this->template->permissionManageSchedule = Permission::MANAGE_SCHEDULE;
-        $this->template->permissionManageRooms = Permission::MANAGE_ROOMS;
-        $this->template->permissionManageCategories = Permission::MANAGE_CATEGORIES;
-        $this->template->permissionChoosePrograms = Permission::CHOOSE_PROGRAMS;
+        $this->template->permissionManageSchedule    = Permission::MANAGE_SCHEDULE;
+        $this->template->permissionManageRooms       = Permission::MANAGE_ROOMS;
+        $this->template->permissionManageCategories  = Permission::MANAGE_CATEGORIES;
+        $this->template->permissionChoosePrograms    = Permission::CHOOSE_PROGRAMS;
 
-        $this->template->footer = $this->settingsService->getValue(Settings::FOOTER);
+        $this->template->footer      = $this->settingsService->getValue(Settings::FOOTER);
         $this->template->seminarName = $this->settingsService->getValue(Settings::SEMINAR_NAME);
 
         $this->template->settings = $this->settingsService;
@@ -140,9 +137,9 @@ abstract class AdminBasePresenter extends BasePresenter
      *
      * @throws AbortException
      */
-    public function checkPermission(string $permission): void
+    public function checkPermission(string $permission) : void
     {
-        if (!$this->user->isAllowed($this->resource, $permission)) {
+        if (! $this->user->isAllowed($this->resource, $permission)) {
             $this->flashMessage('admin.common.access_denied', 'danger', 'lock');
             $this->redirect(':Admin:Dashboard:default');
         }
@@ -151,9 +148,8 @@ abstract class AdminBasePresenter extends BasePresenter
     /**
      * @throws AbortException
      */
-    public function handleChangeRole(int $roleId): void
+    public function handleChangeRole(int $roleId) : void
     {
         $this->redirect('this');
     }
-
 }

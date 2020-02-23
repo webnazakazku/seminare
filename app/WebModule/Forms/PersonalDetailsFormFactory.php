@@ -12,8 +12,6 @@ use Nette;
 use Nette\Application\UI\Form;
 use Nextras\FormComponents\Controls\DateControl;
 use stdClass;
-use Tracy\Debugger;
-use Tracy\ILogger;
 use function property_exists;
 
 /**
@@ -25,7 +23,6 @@ use function property_exists;
  */
 class PersonalDetailsFormFactory
 {
-
     use Nette\SmartObject;
 
     /**
@@ -44,13 +41,13 @@ class PersonalDetailsFormFactory
     public function __construct(BaseFormFactory $baseFormFactory, UserRepository $userRepository)
     {
         $this->baseFormFactory = $baseFormFactory;
-        $this->userRepository = $userRepository;
+        $this->userRepository  = $userRepository;
     }
 
     /**
      * Vytvoří formulář.
      */
-    public function create(int $id): Form
+    public function create(int $id) : Form
     {
         $this->user = $this->userRepository->findById($id);
 
@@ -122,7 +119,7 @@ class PersonalDetailsFormFactory
      *
      * @throws ORMException
      */
-    public function processForm(Form $form, stdClass $values): void
+    public function processForm(Form $form, stdClass $values) : void
     {
         if (property_exists($values, 'sex')) {
             $this->user->setSex($values->sex);
@@ -151,5 +148,4 @@ class PersonalDetailsFormFactory
 
         $this->userRepository->save($this->user);
     }
-
 }

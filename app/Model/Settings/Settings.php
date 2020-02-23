@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Settings
 {
-
     /**
      * Administrátor byl vytvořen.
      */
@@ -224,18 +223,17 @@ class Settings
 
     public function __construct(string $item, ?string $value)
     {
-        $this->item = $item;
+        $this->item  = $item;
         $this->value = $value;
     }
 
-    public function getValue(): ?string
+    public function getValue() : ?string
     {
         return $this->value;
     }
 
-    public function setValue(?string $value): void
+    public function setValue(?string $value) : void
     {
         $this->value = $value;
     }
-
 }
