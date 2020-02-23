@@ -32,7 +32,6 @@ services:
 	- App\Services\UserService
 
 	- App\Commands\ClearCacheCommand(%appDir%/..)
-	- App\ApiModule\Services\ScheduleService
 	- App\Utils\Validators
 
 	permissionRepository:

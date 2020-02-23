@@ -26,13 +26,6 @@ final class RouterFactory
 
         $router[] = new Route('index.php', 'Web:Page:default', Route::ONE_WAY);
 
-        $router[] = new Route('api/<presenter>/<action>[/<id>]', [
-            'module' => 'Api',
-            'presenter' => null,
-            'action' => null,
-            'id' => null,
-        ]);
-
         $router[] = new Route('export/<presenter>/<action>[/<id>]', [
             'module' => 'Export',
             'presenter' => null,
