@@ -205,11 +205,6 @@ class Page
             $mainContents[] = $content->convertToDto();
         }
 
-        $sidebarContents = [];
-        foreach ($this->getContents(Content::SIDEBAR)->toArray() as $content) {
-            $sidebarContents[] = $content->convertToDto();
-        }
-
-        return new PageDto($this->name, $this->slug, $allowedRoles, $mainContents, $sidebarContents, ! empty($sidebarContents));
+        return new PageDto($this->name, $this->slug, $allowedRoles, $mainContents);
     }
 }

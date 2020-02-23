@@ -49,7 +49,6 @@
                     || $presenter->isLinkCurrent(':Admin:Configuration:Place:*')
                     || $presenter->isLinkCurrent(':Admin:Configuration:Program:*')
                     || $presenter->isLinkCurrent(':Admin:Configuration:Seminar:*')
-                    || $presenter->isLinkCurrent(':Admin:Configuration:SkautIs:*')
                     || $presenter->isLinkCurrent(':Admin:Configuration:Web:*')
                     || $presenter->isLinkCurrent(':Admin:Configuration:System:*')
                     || $presenter->isLinkCurrent(':Admin:Configuration:Subevents:*')
@@ -64,23 +63,6 @@
                     <a class="btn btn-light btn-sm" href="https://napoveda.skaut.cz/srs" target="_blank">
                         <i class="fa fa-question-circle"></i> {_admin.menu.help}
                     </a>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown mr-1 ml-1" id="role-menu">
-                <div class="navbar-btn">
-                    <button class="btn btn-light btn-sm dropdown-toggle" data-toggle="dropdown">
-                            <span id="role-menu-text">
-                                {if $skautIsRoleSelected}
-                                    {$skautIsRoleSelected->DisplayName}
-                                {/if}
-                            </span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a href="{plink changeRole!, $r->ID}" n:foreach="$skautIsRoles as $r" n:class="dropdown-item, $r->ID == $skautIsRoleSelected->ID ? active">
-                            {$r->DisplayName}
-                        </a>
-                    </div>
                 </div>
             </li>
 

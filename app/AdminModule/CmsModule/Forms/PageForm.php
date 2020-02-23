@@ -170,8 +170,6 @@ class PageForm extends UI\Control
         $form->addSubmit('submitAdd', 'admin.common.add');
         $form->addSubmit('submitMain', 'common.area.main')
             ->setHtmlAttribute('class', 'nav-link');
-        $form->addSubmit('submitSidebar', 'common.area.sidebar')
-            ->setHtmlAttribute('class', 'nav-link');
 
         $form->getElementPrototype()->onsubmit('tinyMCE.triggerSave()');
         $form->onSuccess[] = [$this, 'processForm'];
@@ -219,8 +217,6 @@ class PageForm extends UI\Control
             $submitName = 'submitAdd';
         } elseif ($form->isSubmitted() === $form['submitMain']) {
             $submitName = 'submitMain';
-        } elseif ($form->isSubmitted() === $form['submitSidebar']) {
-            $submitName = 'submitSidebar';
         } elseif ($form->isSubmitted() === $form['submitAndContinue']) {
             $submitName = 'submitAndContinue';
         } else {

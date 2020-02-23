@@ -31,8 +31,7 @@ use stdClass;
  *     "users_content" = "UsersContent",
  *     "lectors_content" = "LectorsContent",
  *     "blocks_content" = "BlocksContent",
- *     "capacities_content" = "CapacitiesContent",
- *     "organizer_content" = "OrganizerContent"
+ *     "capacities_content" = "CapacitiesContent"
  * })
  *
  * @author Michal Májský
@@ -106,21 +105,9 @@ abstract class Content implements IContent
     public const CAPACITIES = 'capacities';
 
     /**
-     * OrganizerContent
-     */
-    public const ORGANIZER = 'organizer';
-
-
-    /**
      * Hlavní oblast stránky.
      */
     public const MAIN = 'main';
-
-    /**
-     * Postranní panel stránky.
-     */
-    public const SIDEBAR = 'sidebar';
-
 
     /** @var string[] */
     public static $types = [
@@ -137,13 +124,11 @@ abstract class Content implements IContent
         self::LECTORS,
         self::BLOCKS,
         self::CAPACITIES,
-        self::ORGANIZER,
     ];
 
     /** @var string[] */
     public static $areas = [
         self::MAIN,
-        self::SIDEBAR,
     ];
 
     /**

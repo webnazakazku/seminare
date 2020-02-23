@@ -70,7 +70,6 @@ content:
 
 area:
     main: "Hlavní oblast"
-    sidebar: "Postranní lišta"
 
 align:
     left: "Vlevo"

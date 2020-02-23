@@ -37,32 +37,15 @@ class PageDto
     protected $mainContents;
 
     /**
-     * Obsahy v postranní části stránky.
-     *
-     * @var ContentDto[]
-     */
-    protected $sidebarContents;
-
-    /**
-     * Má stránka sidebar?
-     *
-     * @var bool
-     */
-    protected $hasSidebar;
-
-    /**
      * @param string[]     $allowedRoles
      * @param ContentDto[] $mainContents
-     * @param ContentDto[] $sidebarContents
      */
-    public function __construct(string $name, string $slug, array $allowedRoles, array $mainContents, array $sidebarContents, bool $hasSidebar)
+    public function __construct(string $name, string $slug, array $allowedRoles, array $mainContents)
     {
-        $this->name            = $name;
-        $this->slug            = $slug;
-        $this->allowedRoles    = $allowedRoles;
-        $this->mainContents    = $mainContents;
-        $this->sidebarContents = $sidebarContents;
-        $this->hasSidebar      = $hasSidebar;
+        $this->name         = $name;
+        $this->slug         = $slug;
+        $this->allowedRoles = $allowedRoles;
+        $this->mainContents = $mainContents;
     }
 
     public function getName() : string
@@ -89,19 +72,6 @@ class PageDto
     public function getMainContents() : array
     {
         return $this->mainContents;
-    }
-
-    /**
-     * @return ContentDto[]
-     */
-    public function getSidebarContents() : array
-    {
-        return $this->sidebarContents;
-    }
-
-    public function hasSidebar() : bool
-    {
-        return $this->hasSidebar;
     }
 
     /**
