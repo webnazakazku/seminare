@@ -43,7 +43,6 @@ app.controller('WebScheduleCtrl', function WebScheduleCtrl($scope, $http, $q, ui
                 $scope.config = response.data;
                 calendarConfig = $scope.uiConfig.calendar;
                 calendarConfig.defaultDate = $.fullCalendar.moment($scope.config.seminar_from_date);
-                calendarConfig.views.seminar.duration.days = $scope.config.seminar_duration;
             }, function (response) {
                 $scope.flashMessage('Nepodařilo se načíst nastavení kalendáře.', 'danger');
             }).finally(function () {
@@ -201,20 +200,10 @@ app.controller('WebScheduleCtrl', function WebScheduleCtrl($scope, $http, $q, ui
         calendar: {
             lang: 'cs',
             timezone: false,
-            defaultView: 'seminar',
             aspectRatio: 1.6,
             header: false,
             editable: false,
-            views: {
-                seminar: {
-                    type: 'agenda',
-                    buttonText: 'Seminář',
-                    allDaySlot: false,
-                    duration: {days: 7},
-                    slotDuration: '00:15:00',
-                    slotLabelInterval: '01:00:00'
-                }
-            },
+            view: 'dayGridMonth',
             eventTextColor: '#fff',
             eventClick: function (event, element) {
                 if ($scope.loading == 0) {
